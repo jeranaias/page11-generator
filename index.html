@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Generate properly formatted NAVPERS 1070/613 (Page 11) entries for common situations">
+  <title>Page 11 Entry Generator - USMC Tools</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B0000">
+  <link rel="apple-touch-icon" href="assets/icon-192.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Skip Link - Accessibility -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="header no-print">
+    <div class="container">
+      <h1 class="header__title">Page 11 Entry Generator</h1>
+      <p class="header__subtitle">NAVPERS 1070/613 Administrative Remarks</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <span class="theme-icon"></span>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main" class="container">
+    <!-- Step 1: Category & Type Selection -->
+    <section id="step-select" class="card card--elevated">
+      <div class="card__header">
+        <h2 class="card__title">Select Entry Type</h2>
+        <p class="card__subtitle">Choose the type of Page 11 entry to generate</p>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="categorySelect">Category</label>
+        <select class="input select" id="categorySelect">
+          <option value="">Select a category...</option>
+          <option value="training">Training &amp; Qualifications</option>
+          <option value="counseling">Counselings (Non-Adverse)</option>
+          <option value="adverse">Adverse Counselings</option>
+          <option value="6105">6105 Counseling</option>
+          <option value="admin">Administrative Entries</option>
+          <option value="recognition">Recognition</option>
+          <option value="custom">Custom Entry</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="templateSelectGroup" style="display: none;">
+        <label class="label" for="templateSelect">Entry Type</label>
+        <select class="input select" id="templateSelect">
+          <option value="">Select entry type...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="entryDate">Entry Date</label>
+        <input type="date" class="input" id="entryDate">
+        <p class="help-text" id="formattedDate"></p>
+      </div>
+
+      <div class="flex justify-end">
+        <button class="btn btn--primary" id="nextBtn" disabled>Next: Fill Template</button>
+      </div>
+    </section>
+
+    <!-- Step 2: Template Fill -->
+    <section id="step-fill" class="card card--elevated" style="display: none;">
+      <div class="card__header">
+        <h2 class="card__title" id="templateTitle">Fill Template</h2>
+        <p class="card__subtitle">Complete the required fields</p>
+      </div>
+
+      <div id="templateFields"></div>
+
+      <div class="flex gap-3 justify-end mt-4">
+        <button class="btn btn--outline" id="backBtn">Back</button>
+        <button class="btn btn--primary" id="generateBtn">Generate Entry</button>
+      </div>
+    </section>
+
+    <!-- Step 3: Preview & Output -->
+    <section id="step-preview" class="card card--elevated" style="display: none;">
+      <div class="card__header">
+        <h2 class="card__title">Generated Entry</h2>
+        <p class="card__subtitle">Review and copy your Page 11 entry</p>
+      </div>
+
+      <div class="preview-box" id="previewBox">
+        <pre id="previewContent"></pre>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn--primary" id="copyBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy to Clipboard
+        </button>
+        <button class="btn btn--secondary" id="printBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Print
+        </button>
+        <button class="btn btn--outline" id="saveDraftBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          Save Draft
+        </button>
+        <button class="btn btn--outline" id="newEntryBtn">New Entry</button>
+      </div>
+    </section>
+
+    <!-- Saved Drafts -->
+    <section id="drafts-section" class="card" style="display: none;">
+      <div class="card__header">
+        <h2 class="card__title">Saved Drafts</h2>
+      </div>
+      <div id="draftsList"></div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer no-print">
+    <div class="container">
+      <p class="text-sm text-secondary text-center">
+        Free and open source. <a href="https://github.com/jeranaias/page11-generator">View on GitHub</a>
+      </p>
+      <p class="text-sm text-secondary text-center mt-4">
+        Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Print-only content -->
+  <div class="print-only" id="printContent"></div>
+
+  <!-- Scripts -->
+  <script src="js/date-utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
