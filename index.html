@@ -13,6 +13,9 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <!-- Skip Link - Accessibility -->
@@ -65,7 +68,26 @@
         <p class="help-text" id="formattedDate"></p>
       </div>
 
-      <div class="flex justify-end">
+      <!-- Marine Identification (for PDF header) -->
+      <div class="card" style="background: var(--bg-secondary); margin-top: var(--space-4);">
+        <p class="text-sm text-secondary" style="margin-bottom: var(--space-3);">Marine Information (for PDF form header)</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="label" for="marineName">Name (Last, First MI)</label>
+            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN A">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="label" for="marineGrade">Grade</label>
+            <input type="text" class="input" id="marineGrade" placeholder="LCpl">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="label" for="marineSSN">SSN (Last 4)</label>
+            <input type="text" class="input" id="marineSSN" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4">
         <button class="btn btn--primary" id="nextBtn" disabled>Next: Fill Template</button>
       </div>
     </section>
@@ -89,7 +111,20 @@
     <section id="step-preview" class="card card--elevated" style="display: none;">
       <div class="card__header">
         <h2 class="card__title">Generated Entry</h2>
-        <p class="card__subtitle">Review and copy your Page 11 entry</p>
+        <p class="card__subtitle">Review your Page 11 entry and download as PDF</p>
+      </div>
+
+      <!-- Primary Action: Download PDF -->
+      <div class="pdf-actions" style="margin-bottom: var(--space-4);">
+        <button class="btn btn--primary btn--lg btn--full" id="downloadPdfBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <polyline points="9 15 12 18 15 15"></polyline>
+          </svg>
+          Download NAVMC 118(11) PDF
+        </button>
       </div>
 
       <div class="preview-box" id="previewBox">
@@ -97,14 +132,14 @@
       </div>
 
       <div class="btn-group">
-        <button class="btn btn--primary" id="copyBtn">
+        <button class="btn btn--outline" id="copyBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          Copy to Clipboard
+          Copy Text
         </button>
-        <button class="btn btn--secondary" id="printBtn">
+        <button class="btn btn--outline" id="printBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="6 9 6 2 18 2 18 9"></polyline>
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -120,7 +155,7 @@
           </svg>
           Save Draft
         </button>
-        <button class="btn btn--outline" id="newEntryBtn">New Entry</button>
+        <button class="btn btn--ghost" id="newEntryBtn">New Entry</button>
       </div>
     </section>
 
@@ -155,6 +190,7 @@
   <script src="js/date-utils.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/templates.js"></script>
+  <script src="js/pdf-generator.js"></script>
   <script src="js/app.js"></script>
 
   <!-- Service Worker Registration -->

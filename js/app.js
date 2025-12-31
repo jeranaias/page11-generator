@@ -27,6 +27,11 @@
     formattedDate: document.getElementById('formattedDate'),
     nextBtn: document.getElementById('nextBtn'),
 
+    // Marine info (for PDF)
+    marineName: document.getElementById('marineName'),
+    marineGrade: document.getElementById('marineGrade'),
+    marineSSN: document.getElementById('marineSSN'),
+
     // Template fill
     templateTitle: document.getElementById('templateTitle'),
     templateFields: document.getElementById('templateFields'),
@@ -36,6 +41,7 @@
     // Preview
     previewBox: document.getElementById('previewBox'),
     previewContent: document.getElementById('previewContent'),
+    downloadPdfBtn: document.getElementById('downloadPdfBtn'),
     copyBtn: document.getElementById('copyBtn'),
     printBtn: document.getElementById('printBtn'),
     saveDraftBtn: document.getElementById('saveDraftBtn'),
@@ -76,6 +82,7 @@
     elements.generateBtn.addEventListener('click', generateEntry);
 
     // Preview actions
+    elements.downloadPdfBtn.addEventListener('click', downloadPdf);
     elements.copyBtn.addEventListener('click', copyToClipboard);
     elements.printBtn.addEventListener('click', printEntry);
     elements.saveDraftBtn.addEventListener('click', saveDraft);
@@ -411,6 +418,22 @@
   }
 
   // Actions
+  function downloadPdf() {
+    try {
+      PDFGenerator.generate({
+        entryText: generatedEntry,
+        marineName: elements.marineName.value.toUpperCase() || '',
+        marineGrade: elements.marineGrade.value.toUpperCase() || '',
+        marineSSN: elements.marineSSN.value || '',
+        templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
+      });
+      showToast('PDF downloaded!', 'success');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showToast('Error generating PDF. Please try again.', 'error');
+    }
+  }
+
   async function copyToClipboard() {
     try {
       await navigator.clipboard.writeText(generatedEntry);

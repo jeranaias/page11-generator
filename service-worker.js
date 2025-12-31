@@ -3,7 +3,7 @@
  * Enables offline functionality
  */
 
-const CACHE_NAME = 'page11-generator-v1';
+const CACHE_NAME = 'page11-generator-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const urlsToCache = [
   '/js/templates.js',
   '/js/date-utils.js',
   '/js/storage.js',
+  '/js/pdf-generator.js',
   '/assets/icon-192.svg',
   '/assets/icon-512.svg',
   '/manifest.json'
