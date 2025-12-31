@@ -725,6 +725,55 @@ body {
 .w-full { width: 100%; }
 
 /* ==========================================================================
+   Marine Info Card
+   ========================================================================== */
+.marine-info-card {
+  background: var(--bg-secondary);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-4);
+  border: 1px solid var(--border-light);
+}
+
+.marine-info-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.marine-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.marine-info-grid .form-group {
+  margin-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .marine-info-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   PDF Actions
+   ========================================================================== */
+.pdf-actions {
+  margin-bottom: var(--space-4);
+}
+
+.pdf-actions .btn {
+  font-size: var(--text-base);
+}
+
+.pdf-actions .btn svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
    Footer
    ========================================================================== */
 .footer {

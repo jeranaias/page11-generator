@@ -1,283 +1,285 @@
 /**
  * PDF Generator for NAVMC 118(11) - Administrative Remarks
- * Generates properly formatted Page 11 entries on the official form layout
+ * Generates properly formatted Page 11 entries matching official form layout
+ * Based on MCO P1070.12K (IRAM) Chapter 4
  */
 
 const PDFGenerator = {
-  // Form dimensions (Letter size: 8.5" x 11" at 72 DPI)
-  PAGE_WIDTH: 612,
-  PAGE_HEIGHT: 792,
-  MARGIN_LEFT: 54,      // 0.75 inch
-  MARGIN_RIGHT: 54,
-  MARGIN_TOP: 54,
-  MARGIN_BOTTOM: 54,
-
-  // Content area
-  get CONTENT_WIDTH() {
-    return this.PAGE_WIDTH - this.MARGIN_LEFT - this.MARGIN_RIGHT;
-  },
-
   /**
-   * Generate a PDF with the Page 11 entry
+   * Generate PDF with the Page 11 entry
    * @param {object} options - Generation options
+   * @returns {Blob|null} PDF blob or null if download mode
    */
-  generate(options) {
+  generate(options, returnBlob = false) {
+    if (!window.jspdf) {
+      console.error('jsPDF not loaded');
+      return null;
+    }
+
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
+
+    // Page dimensions (Letter size in points)
+    const PW = 612;       // Page width
+    const PH = 792;       // Page height
+    const ML = 54;        // Margin left (0.75")
+    const MR = 54;        // Margin right
+    const MT = 54;        // Margin top
+    const MB = 72;        // Margin bottom (1")
+    const CW = PW - ML - MR;  // Content width
+
+    // Typography
+    const FONT_SIZE = 11;
+    const LH = 14;        // Line height
+    const FONT_BODY = 'courier';
+    const FONT_HEADER = 'helvetica';
+
+    const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'pt',
       format: 'letter'
     });
 
-    // Set default font
-    doc.setFont('helvetica');
-
-    // Draw the form
-    this.drawFormHeader(doc, options);
-    this.drawIdentificationBlock(doc, options);
-    this.drawRemarksHeader(doc);
-    const finalY = this.drawEntryContent(doc, options.entryText);
-    this.drawFormFooter(doc);
-
-    // Generate filename and save
-    const filename = this.generateFilename(options.templateName);
-    doc.save(filename);
-  },
-
-  /**
-   * Draw the official form header
-   */
-  drawFormHeader(doc, options) {
-    const centerX = this.PAGE_WIDTH / 2;
-    let y = this.MARGIN_TOP;
-
-    // Form number and revision - top left
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('NAVMC 118(11) (REV. 12-2024)', this.MARGIN_LEFT, y);
-
-    // Privacy Act Statement reference - top right
-    doc.setFontSize(7);
-    doc.text('PRIVACY ACT STATEMENT: See SECNAVINST 5211.5',
-             this.PAGE_WIDTH - this.MARGIN_RIGHT, y, { align: 'right' });
-
-    y += 20;
-
-    // Marine Corps Eagle, Globe, and Anchor would go here (using text placeholder)
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('UNITED STATES MARINE CORPS', centerX, y, { align: 'center' });
-
-    y += 18;
-
-    // Form title
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ADMINISTRATIVE REMARKS', centerX, y, { align: 'center' });
-
-    y += 8;
-
-    // Subtitle
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('(Page 11 of the Service Record)', centerX, y, { align: 'center' });
-
-    return y + 15;
-  },
-
-  /**
-   * Draw the identification block with boxes
-   */
-  drawIdentificationBlock(doc, options) {
-    const y = 115;
-    const boxHeight = 32;
-    const col1Width = 250;
-    const col2Width = 120;
-    const col3Width = this.CONTENT_WIDTH - col1Width - col2Width;
-
-    // Draw boxes
-    doc.setLineWidth(0.5);
-    doc.setDrawColor(0);
-
-    // Name box
-    doc.rect(this.MARGIN_LEFT, y, col1Width, boxHeight);
-    // Grade box
-    doc.rect(this.MARGIN_LEFT + col1Width, y, col2Width, boxHeight);
-    // SSN box
-    doc.rect(this.MARGIN_LEFT + col1Width + col2Width, y, col3Width, boxHeight);
-
-    // Labels (small, inside top of box)
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('1. NAME (Last, First, Middle Initial)', this.MARGIN_LEFT + 3, y + 9);
-    doc.text('2. GRADE', this.MARGIN_LEFT + col1Width + 3, y + 9);
-    doc.text('3. SSN (Last 4)', this.MARGIN_LEFT + col1Width + col2Width + 3, y + 9);
-
-    // Values (larger, in center of box)
-    doc.setFontSize(11);
-    doc.setFont('courier', 'bold');
-
-    if (options.marineName) {
-      doc.text(options.marineName, this.MARGIN_LEFT + 5, y + 24);
-    }
-    if (options.marineGrade) {
-      doc.text(options.marineGrade, this.MARGIN_LEFT + col1Width + 5, y + 24);
-    }
-    if (options.marineSSN) {
-      doc.text('XXX-XX-' + options.marineSSN, this.MARGIN_LEFT + col1Width + col2Width + 5, y + 24);
-    }
-
-    return y + boxHeight;
-  },
-
-  /**
-   * Draw the remarks section header
-   */
-  drawRemarksHeader(doc) {
-    const y = 155;
-
-    // Section header
-    doc.setLineWidth(1);
-    doc.line(this.MARGIN_LEFT, y, this.PAGE_WIDTH - this.MARGIN_RIGHT, y);
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('4. CHRONOLOGICAL RECORD OF ADMINISTRATIVE REMARKS',
-             this.PAGE_WIDTH / 2, y + 12, { align: 'center' });
-
-    doc.setLineWidth(0.5);
-    doc.line(this.MARGIN_LEFT, y + 18, this.PAGE_WIDTH - this.MARGIN_RIGHT, y + 18);
-
-    return y + 25;
-  },
-
-  /**
-   * Draw the entry content with proper formatting
-   */
-  drawEntryContent(doc, entryText) {
-    const startY = 185;
-    const maxWidth = this.CONTENT_WIDTH - 10;
-    const lineHeight = 13;
-    const pageBottom = this.PAGE_HEIGHT - this.MARGIN_BOTTOM - 40;
-
-    // Use Courier for the actual entry (standard for government forms)
-    doc.setFontSize(10);
-    doc.setFont('courier', 'normal');
-
-    // Split entry text into lines
-    const lines = entryText.split('\n');
-    let currentY = startY;
+    let y = MT;
     let pageNum = 1;
 
-    lines.forEach((line, index) => {
-      if (line.trim().length > 0) {
-        // Check if this is a centered signature line
-        const isCentered = line.includes('_______') ||
-                          line.includes('[Marine') ||
-                          line.includes('[Counselor') ||
-                          line.includes('[Witness') ||
-                          line.includes('[Commanding');
-
-        // Wrap long lines
-        const wrappedLines = doc.splitTextToSize(line.trim(), maxWidth);
-
-        wrappedLines.forEach(wrappedLine => {
-          // Check if we need a new page
-          if (currentY > pageBottom) {
-            doc.addPage();
-            pageNum++;
-            this.drawContinuationHeader(doc, pageNum);
-            currentY = 100;
-          }
-
-          // Draw the line
-          if (isCentered) {
-            // Right-align signature lines
-            doc.text(wrappedLine, this.PAGE_WIDTH - this.MARGIN_RIGHT - 20, currentY, { align: 'right' });
-          } else {
-            doc.text(wrappedLine, this.MARGIN_LEFT + 5, currentY);
-          }
-          currentY += lineHeight;
-        });
-      } else {
-        // Empty line - add smaller spacing
-        currentY += lineHeight * 0.6;
+    /**
+     * Check if page break is needed, add new page if so
+     */
+    function pageBreak(need) {
+      if (y + need > PH - MB) {
+        pdf.addPage();
+        pageNum++;
+        y = MT;
+        drawContinuationHeader();
       }
+    }
+
+    /**
+     * Draw header for continuation pages
+     */
+    function drawContinuationHeader() {
+      pdf.setFont(FONT_HEADER, 'normal');
+      pdf.setFontSize(8);
+      pdf.text('NAVMC 118(11) (CONTINUATION)', ML, MT - 20);
+
+      pdf.setFont(FONT_HEADER, 'bold');
+      pdf.setFontSize(10);
+      pdf.text('ADMINISTRATIVE REMARKS (CONTINUED)', PW / 2, MT - 5, { align: 'center' });
+
+      pdf.setLineWidth(0.5);
+      pdf.line(ML, MT + 5, PW - MR, MT + 5);
+
+      y = MT + 20;
+    }
+
+    // ========================================
+    // FORM HEADER
+    // ========================================
+
+    // Form number - top left
+    pdf.setFont(FONT_HEADER, 'normal');
+    pdf.setFontSize(8);
+    pdf.text('NAVMC 118(11) (REV. 12-2024)', ML, y - 15);
+
+    // Privacy Act Statement - top right
+    pdf.setFontSize(6);
+    pdf.text('PRIVACY ACT STATEMENT: Authority 5 U.S.C. 301', PW - MR, y - 15, { align: 'right' });
+
+    // Title block
+    pdf.setFont(FONT_HEADER, 'bold');
+    pdf.setFontSize(10);
+    pdf.text('UNITED STATES MARINE CORPS', PW / 2, y, { align: 'center' });
+    y += 16;
+
+    pdf.setFontSize(14);
+    pdf.text('ADMINISTRATIVE REMARKS', PW / 2, y, { align: 'center' });
+    y += 10;
+
+    pdf.setFont(FONT_HEADER, 'normal');
+    pdf.setFontSize(8);
+    pdf.text('(Page 11 of the Service Record)', PW / 2, y, { align: 'center' });
+    y += 15;
+
+    // ========================================
+    // IDENTIFICATION BLOCK
+    // ========================================
+
+    const boxY = y;
+    const boxH = 30;
+    const col1W = 260;
+    const col2W = 100;
+    const col3W = CW - col1W - col2W;
+
+    pdf.setLineWidth(0.75);
+    pdf.setDrawColor(0);
+
+    // Draw boxes
+    pdf.rect(ML, boxY, col1W, boxH);
+    pdf.rect(ML + col1W, boxY, col2W, boxH);
+    pdf.rect(ML + col1W + col2W, boxY, col3W, boxH);
+
+    // Box labels
+    pdf.setFont(FONT_HEADER, 'normal');
+    pdf.setFontSize(6);
+    pdf.text('1. NAME (Last, First, Middle Initial)', ML + 2, boxY + 8);
+    pdf.text('2. GRADE', ML + col1W + 2, boxY + 8);
+    pdf.text('3. SSN (Last 4)', ML + col1W + col2W + 2, boxY + 8);
+
+    // Box values
+    pdf.setFont(FONT_BODY, 'bold');
+    pdf.setFontSize(11);
+
+    if (options.marineName) {
+      pdf.text(options.marineName, ML + 4, boxY + 22);
+    }
+    if (options.marineGrade) {
+      pdf.text(options.marineGrade, ML + col1W + 4, boxY + 22);
+    }
+    if (options.marineSSN) {
+      pdf.text('XXX-XX-' + options.marineSSN, ML + col1W + col2W + 4, boxY + 22);
+    }
+
+    y = boxY + boxH + 8;
+
+    // ========================================
+    // REMARKS SECTION HEADER
+    // ========================================
+
+    pdf.setLineWidth(1);
+    pdf.line(ML, y, PW - MR, y);
+    y += 12;
+
+    pdf.setFont(FONT_HEADER, 'bold');
+    pdf.setFontSize(9);
+    pdf.text('4. CHRONOLOGICAL RECORD OF ADMINISTRATIVE REMARKS', PW / 2, y, { align: 'center' });
+    y += 8;
+
+    pdf.setLineWidth(0.5);
+    pdf.line(ML, y, PW - MR, y);
+    y += 15;
+
+    // ========================================
+    // ENTRY CONTENT
+    // ========================================
+
+    pdf.setFont(FONT_BODY, 'normal');
+    pdf.setFontSize(FONT_SIZE);
+
+    const entryLines = options.entryText.split('\n');
+    const contentStartY = y;
+
+    entryLines.forEach((line, idx) => {
+      if (line.trim().length === 0) {
+        // Empty line - smaller spacing
+        y += LH * 0.6;
+        return;
+      }
+
+      // Check if this is a signature line (right-aligned)
+      const isSignatureLine = line.includes('_______') ||
+                              line.includes('[Marine') ||
+                              line.includes('[Counselor') ||
+                              line.includes('[Witness') ||
+                              line.includes('[Commanding') ||
+                              line.includes('(Signature');
+
+      // Wrap text
+      const maxWidth = CW - 10;
+      const wrappedLines = pdf.splitTextToSize(line.trim(), maxWidth);
+
+      wrappedLines.forEach(wrapLine => {
+        pageBreak(LH);
+
+        if (isSignatureLine) {
+          // Right-align signature lines with proper spacing
+          pdf.text(wrapLine, PW - MR - 10, y, { align: 'right' });
+        } else {
+          pdf.text(wrapLine, ML + 5, y);
+        }
+        y += LH;
+      });
     });
 
-    return currentY;
-  },
+    // ========================================
+    // FOOTER ON ALL PAGES
+    // ========================================
 
-  /**
-   * Draw continuation page header
-   */
-  drawContinuationHeader(doc, pageNum) {
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('NAVMC 118(11) (CONTINUATION)', this.MARGIN_LEFT, this.MARGIN_TOP);
+    const totalPages = pdf.internal.getNumberOfPages();
 
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ADMINISTRATIVE REMARKS (CONTINUED)',
-             this.PAGE_WIDTH / 2, this.MARGIN_TOP + 20, { align: 'center' });
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
 
-    doc.setLineWidth(0.5);
-    doc.line(this.MARGIN_LEFT, this.MARGIN_TOP + 30,
-             this.PAGE_WIDTH - this.MARGIN_RIGHT, this.MARGIN_TOP + 30);
-  },
-
-  /**
-   * Draw form footer on all pages
-   */
-  drawFormFooter(doc) {
-    const pageCount = doc.internal.getNumberOfPages();
-
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-
-      const footerY = this.PAGE_HEIGHT - 30;
+      const footerY = PH - 40;
 
       // Bottom line
-      doc.setLineWidth(0.5);
-      doc.line(this.MARGIN_LEFT, footerY - 15,
-               this.PAGE_WIDTH - this.MARGIN_RIGHT, footerY - 15);
+      pdf.setLineWidth(0.5);
+      pdf.line(ML, footerY - 10, PW - MR, footerY - 10);
 
-      // Page info
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
+      pdf.setFont(FONT_HEADER, 'normal');
+      pdf.setFontSize(8);
 
-      // Left: Form info
-      doc.text('NAVMC 118(11)', this.MARGIN_LEFT, footerY);
+      // Form number - left
+      pdf.text('NAVMC 118(11)', ML, footerY);
 
-      // Center: Page number
-      doc.text(`Page ${i} of ${pageCount}`,
-               this.PAGE_WIDTH / 2, footerY, { align: 'center' });
+      // Page number - center
+      pdf.text(`Page ${i} of ${totalPages}`, PW / 2, footerY, { align: 'center' });
 
-      // Right: Date generated
+      // Date - right
       const today = new Date();
       const dateStr = today.toLocaleDateString('en-US', {
-        year: 'numeric',
+        day: '2-digit',
         month: 'short',
-        day: '2-digit'
+        year: 'numeric'
       });
-      doc.text(`Generated: ${dateStr}`,
-               this.PAGE_WIDTH - this.MARGIN_RIGHT, footerY, { align: 'right' });
+      pdf.text(`Generated: ${dateStr}`, PW - MR, footerY, { align: 'right' });
+    }
+
+    // ========================================
+    // OUTPUT
+    // ========================================
+
+    if (returnBlob) {
+      return pdf.output('blob');
+    }
+
+    const filename = this.generateFilename(options.templateName);
+    pdf.save(filename);
+    return null;
+  },
+
+  /**
+   * Generate PDF blob for preview
+   */
+  generateBlob(options) {
+    return this.generate(options, true);
+  },
+
+  /**
+   * Open PDF in new tab for preview
+   */
+  preview(options) {
+    const blob = this.generateBlob(options);
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // Cleanup after a delay
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
   },
 
   /**
-   * Generate a clean filename
+   * Generate clean filename
    */
   generateFilename(templateName) {
-    const date = new Date();
-    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
-    const timeStr = date.toTimeString().slice(0, 5).replace(':', '');
-    const safeName = (templateName || 'entry')
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const time = now.toTimeString().slice(0, 5).replace(':', '');
+    const name = (templateName || 'entry')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
-      .substring(0, 30);
-    return `NAVMC-118-11_${safeName}_${dateStr}_${timeStr}.pdf`;
+      .substring(0, 25);
+    return `NAVMC-118-11_${name}_${date}.pdf`;
   }
 };
 

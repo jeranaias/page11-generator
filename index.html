@@ -3,13 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Generate properly formatted NAVPERS 1070/613 (Page 11) entries for common situations">
-  <title>Page 11 Entry Generator - USMC Tools</title>
+  <title>Page 11 Entry Generator | Free NAVMC 118(11) Tool | USMC</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Free online Page 11 Entry Generator for Marines. Creates MCO P1070.12K (IRAM) compliant NAVMC 118(11) administrative remarks. Instant PDF download, works on NMCI.">
+  <meta name="keywords" content="page 11, NAVMC 118(11), administrative remarks, USMC, Marine Corps, counseling, 6105, IRAM, MCO P1070.12K, service record, page 11 generator, military admin, S-1, personnel, admin clerk">
+  <meta name="author" content="USMC Tools">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jeranaias.github.io/page11-generator/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jeranaias.github.io/page11-generator/">
+  <meta property="og:title" content="Page 11 Entry Generator | Free NAVMC 118(11) Tool">
+  <meta property="og:description" content="Free online tool for Marines. Creates properly formatted Page 11 entries. Instant PDF, works on NMCI, no install needed.">
+  <meta property="og:site_name" content="Page 11 Entry Generator">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Page 11 Entry Generator | Free NAVMC 118(11) Tool">
+  <meta name="twitter:description" content="Free online tool for Marines. Creates properly formatted Page 11 entries.">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B0000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Page 11 Gen">
   <link rel="apple-touch-icon" href="assets/icon-192.svg">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Page 11 Entry Generator",
+    "alternateName": ["NAVMC 118(11) Generator", "Page 11 Generator", "6105 Generator"],
+    "description": "Free online tool for creating MCO P1070.12K (IRAM) compliant Page 11 administrative remarks entries for the United States Marine Corps",
+    "url": "https://jeranaias.github.io/page11-generator/",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript. Works on NMCI and government computers.",
+    "softwareVersion": "1.0.0",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "MCO P1070.12K (IRAM) compliant formatting",
+      "16 pre-built templates",
+      "6105 counseling with UCMJ article dropdown",
+      "Instant PDF generation",
+      "Works on NMCI computers",
+      "Live preview",
+      "Dark mode",
+      "No installation required"
+    ]
+  }
+  </script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
@@ -25,7 +78,7 @@
   <header class="header no-print">
     <div class="container">
       <h1 class="header__title">Page 11 Entry Generator</h1>
-      <p class="header__subtitle">NAVPERS 1070/613 Administrative Remarks</p>
+      <p class="header__subtitle">NAVMC 118(11) Administrative Remarks</p>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
       <span class="theme-icon"></span>
@@ -68,21 +121,21 @@
         <p class="help-text" id="formattedDate"></p>
       </div>
 
-      <!-- Marine Identification (for PDF header) -->
-      <div class="card" style="background: var(--bg-secondary); margin-top: var(--space-4);">
-        <p class="text-sm text-secondary" style="margin-bottom: var(--space-3);">Marine Information (for PDF form header)</p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="form-group" style="margin-bottom: 0;">
+      <!-- Marine Identification -->
+      <div class="marine-info-card">
+        <p class="marine-info-label">Marine Information (for PDF form header)</p>
+        <div class="marine-info-grid">
+          <div class="form-group">
             <label class="label" for="marineName">Name (Last, First MI)</label>
-            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN A">
+            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN A" autocomplete="off">
           </div>
-          <div class="form-group" style="margin-bottom: 0;">
+          <div class="form-group">
             <label class="label" for="marineGrade">Grade</label>
-            <input type="text" class="input" id="marineGrade" placeholder="LCpl">
+            <input type="text" class="input" id="marineGrade" placeholder="LCpl" autocomplete="off">
           </div>
-          <div class="form-group" style="margin-bottom: 0;">
+          <div class="form-group">
             <label class="label" for="marineSSN">SSN (Last 4)</label>
-            <input type="text" class="input" id="marineSSN" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+            <input type="text" class="input" id="marineSSN" placeholder="1234" maxlength="4" pattern="[0-9]{4}" autocomplete="off">
           </div>
         </div>
       </div>
@@ -128,7 +181,7 @@
       </div>
 
       <!-- Primary Action: Download PDF -->
-      <div class="pdf-actions" style="margin-bottom: var(--space-4);">
+      <div class="pdf-actions">
         <button class="btn btn--primary btn--lg btn--full" id="downloadPdfBtn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -188,10 +241,11 @@
   <footer class="footer no-print">
     <div class="container">
       <p class="text-sm text-secondary text-center">
-        Free and open source. <a href="https://github.com/jeranaias/page11-generator">View on GitHub</a>
+        Based on MCO P1070.12K (IRAM) Chapter 4. Free and open source.
       </p>
       <p class="text-sm text-secondary text-center mt-4">
-        Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
+        <a href="https://github.com/jeranaias/page11-generator">GitHub</a> ·
+        Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite
       </p>
     </div>
   </footer>
