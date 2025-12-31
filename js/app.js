@@ -38,6 +38,9 @@
     backBtn: document.getElementById('backBtn'),
     generateBtn: document.getElementById('generateBtn'),
 
+    // Live Preview
+    livePreviewContent: document.getElementById('livePreviewContent'),
+
     // Preview
     previewBox: document.getElementById('previewBox'),
     previewContent: document.getElementById('previewContent'),
@@ -178,6 +181,9 @@
       const fieldContainer = createFormField(field);
       elements.templateFields.appendChild(fieldContainer);
     });
+
+    // Initial live preview
+    updateLivePreview();
   }
 
   function createFormField(field) {
@@ -284,7 +290,10 @@
         break;
     }
 
+    // Add input event listener for live preview
     if (field.type !== 'radio') {
+      input.addEventListener('input', updateLivePreview);
+      input.addEventListener('change', updateLivePreview);
       container.appendChild(input);
     } else {
       container.appendChild(input);
@@ -305,6 +314,77 @@
         }
       }
     });
+    // Update live preview
+    updateLivePreview();
+  }
+
+  // Live Preview Update
+  function updateLivePreview() {
+    if (!currentTemplate) return;
+
+    // Collect current values from all fields
+    const values = {};
+    currentTemplate.fields.forEach(field => {
+      if (field.type === 'radio') {
+        const selected = document.querySelector(`input[name="field-${field.id}"]:checked`);
+        values[field.id] = selected ? selected.value : `[${field.label}]`;
+      } else {
+        const input = document.getElementById(`field-${field.id}`);
+        values[field.id] = input && input.value ? input.value : `[${field.label}]`;
+      }
+    });
+
+    // Get entry date
+    const entryDate = elements.entryDate.value
+      ? DateUtils.inputToMilitary(elements.entryDate.value)
+      : '[DATE]';
+
+    // Fill template
+    let output = currentTemplate.template;
+    output = output.replace('[DATE]', entryDate);
+
+    // Replace field placeholders
+    Object.keys(values).forEach(key => {
+      let value = values[key];
+
+      // Convert dates to military format if value is a date input
+      const field = currentTemplate.fields.find(f => f.id === key);
+      if (field && field.type === 'date' && value && !value.startsWith('[')) {
+        value = DateUtils.inputToMilitary(value);
+      }
+
+      output = output.replace(new RegExp(`\\[${key}\\]`, 'g'), value);
+    });
+
+    // Handle 6105 violation reference
+    if (currentTemplate.id === '6105_counseling') {
+      const violationType = values.violation_type;
+      let violationRef = '[Violation Reference]';
+      if (violationType === 'UCMJ Article' && values.ucmj_article && !values.ucmj_article.startsWith('[')) {
+        violationRef = values.ucmj_article;
+      } else if (violationType === 'Policy/Regulation Violation' && values.policy_reference && !values.policy_reference.startsWith('[')) {
+        violationRef = values.policy_reference;
+      }
+      output = output.replace('[violation_reference]', violationRef);
+    }
+
+    // Handle custom entry signature lines
+    if (currentTemplate.id === 'custom') {
+      let sigLines = '';
+      if (values.include_marine_sig === 'Yes') {
+        sigLines += `\n                                    _______________________\n                                    [Marine's Signature]`;
+      }
+      if (values.include_counselor_sig === 'Yes') {
+        sigLines += `\n\n                                    _______________________\n                                    [Counselor's Signature]`;
+      }
+      if (values.include_witness_sig === 'Yes') {
+        sigLines += `\n\n                                    _______________________\n                                    [Witness Signature]`;
+      }
+      output = output.replace('[signature_lines]', sigLines);
+    }
+
+    // Update live preview
+    elements.livePreviewContent.textContent = output;
   }
 
   // Entry Generation

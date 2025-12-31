@@ -96,14 +96,27 @@
     <section id="step-fill" class="card card--elevated" style="display: none;">
       <div class="card__header">
         <h2 class="card__title" id="templateTitle">Fill Template</h2>
-        <p class="card__subtitle">Complete the required fields</p>
+        <p class="card__subtitle">Complete the required fields - preview updates live</p>
       </div>
 
-      <div id="templateFields"></div>
+      <div class="template-fill-grid">
+        <div class="template-fields-col">
+          <div id="templateFields"></div>
+        </div>
+
+        <div class="template-preview-col">
+          <div class="live-preview-header">
+            <span class="live-preview-label">Live Preview</span>
+          </div>
+          <div class="preview-box live-preview-box" id="livePreviewBox">
+            <pre id="livePreviewContent"></pre>
+          </div>
+        </div>
+      </div>
 
       <div class="flex gap-3 justify-end mt-4">
         <button class="btn btn--outline" id="backBtn">Back</button>
-        <button class="btn btn--primary" id="generateBtn">Generate Entry</button>
+        <button class="btn btn--primary" id="generateBtn">Generate & Download PDF</button>
       </div>
     </section>
 
