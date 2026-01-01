@@ -303,7 +303,7 @@ I acknowledge receipt of this counseling and understand its contents.
     fields: [
       { id: "conduct_issue", label: "Describe Conduct Issue", type: "textarea", required: true },
       { id: "incident_date", label: "Date of Incident", type: "date", required: true },
-      { id: "incident_description", label: "What Happened", type: "textarea", required: true }
+      { id: "incident_description", label: "What Happened", type: "textarea", required: true, placeholder: "failed to report for duty on time (don't start with 'you')" }
     ],
     template: `[DATE]
 
@@ -336,7 +336,7 @@ I acknowledge receipt of this counseling and understand its contents.
       { id: "reason", label: "Reason (for subject line)", type: "text", required: true, placeholder: "e.g., UNAUTHORIZED ABSENCE" },
       { id: "deficiency", label: "Specific Deficiency/Misconduct", type: "textarea", required: true },
       { id: "incident_dates", label: "Date(s) of Incident", type: "text", required: true },
-      { id: "incident_description", label: "Detailed Description of Incident/Pattern", type: "textarea", required: true },
+      { id: "incident_description", label: "Detailed Description of Incident/Pattern", type: "textarea", required: true, placeholder: "failed to maintain proper uniform standards (don't start with 'you')" },
       { id: "violation_type", label: "Violation Type", type: "radio", required: true, options: ["UCMJ Article", "Policy/Regulation Violation"] },
       { id: "ucmj_article", label: "UCMJ Article", type: "ucmj_select", required: false, conditional: { field: "violation_type", value: "UCMJ Article" } },
       { id: "policy_reference", label: "Policy/Regulation Reference", type: "text", required: false, placeholder: "e.g., MCO 1020.34H", conditional: { field: "violation_type", value: "Policy/Regulation Violation" } },

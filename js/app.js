@@ -409,7 +409,15 @@ function installPWA() {
         values[field.id] = selected ? selected.value : `[${field.label}]`;
       } else {
         const input = document.getElementById(`field-${field.id}`);
-        values[field.id] = input && input.value ? input.value : `[${field.label}]`;
+        let value = input && input.value ? input.value : `[${field.label}]`;
+
+        // Strip leading "you " or "You " from incident descriptions to avoid duplication
+        // (templates already include "you" before the placeholder)
+        if (field.id === 'incident_description' && value && !value.startsWith('[')) {
+          value = value.replace(/^you\s+/i, '');
+        }
+
+        values[field.id] = value;
       }
     });
 
@@ -484,7 +492,14 @@ function installPWA() {
         currentValues[field.id] = selected ? selected.value : '';
       } else {
         const input = document.getElementById(`field-${field.id}`);
-        currentValues[field.id] = input ? input.value : '';
+        let value = input ? input.value : '';
+
+        // Strip leading "you " or "You " from incident descriptions to avoid duplication
+        if (field.id === 'incident_description' && value) {
+          value = value.replace(/^you\s+/i, '');
+        }
+
+        currentValues[field.id] = value;
       }
 
       // Validate required fields (only if visible)
