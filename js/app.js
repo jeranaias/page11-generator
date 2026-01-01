@@ -2,6 +2,33 @@
  * Page 11 Entry Generator - Main Application
  */
 
+// PWA Install prompt handling
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.style.display = 'inline-block';
+  }
+});
+
+function installPWA() {
+  if (!deferredInstallPrompt) {
+    alert('To install: use your browser menu or look for the install icon in the address bar.');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then((choiceResult) => {
+    deferredInstallPrompt = null;
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+      installBtn.style.display = 'none';
+    }
+  });
+}
+
 (function() {
   'use strict';
 
@@ -104,6 +131,12 @@
 
     // Theme toggle
     elements.themeToggle.addEventListener('click', () => ThemeManager.toggle());
+
+    // PWA install button
+    const pwaInstallBtn = document.getElementById('pwa-install-btn');
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener('click', installPWA);
+    }
 
     // PDF Preview toggle
     if (elements.previewToggle) {
