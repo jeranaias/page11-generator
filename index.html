@@ -165,13 +165,6 @@
 
       <div class="flex gap-3 justify-end mt-4">
         <button class="btn btn--outline" id="backBtn">Back</button>
-        <button class="btn btn--secondary" id="previewToggle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          Live PDF Preview
-        </button>
         <button class="btn btn--primary" id="generateBtn">Generate & Download PDF</button>
       </div>
     </section>
@@ -255,19 +248,6 @@
 
   <!-- Print-only content -->
   <div class="print-only" id="printContent"></div>
-
-  <!-- Live PDF Preview Pane -->
-  <div id="livePreviewPane" class="live-preview-pane no-print">
-    <div class="preview-pane-header">
-      <span>Live PDF Preview</span>
-      <button type="button" class="preview-close" id="previewClose" aria-label="Close preview">&times;</button>
-    </div>
-    <div id="previewLoading" class="preview-loading">
-      <div class="spinner"></div>
-      <span>Generating preview...</span>
-    </div>
-    <iframe id="previewFrame" class="preview-frame" title="PDF Preview"></iframe>
-  </div>
 
   <!-- Scripts -->
   <script src="js/date-utils.js"></script>

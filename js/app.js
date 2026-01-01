@@ -11,11 +11,6 @@
   let currentValues = {};
   let generatedEntry = '';
 
-  // PDF Preview State
-  let pdfPreviewEnabled = false;
-  let pdfPreviewDebounceTimer = null;
-  const PDF_PREVIEW_DEBOUNCE_MS = 750;
-
   // DOM Elements
   const elements = {
     // Sections
@@ -58,14 +53,7 @@
     draftsList: document.getElementById('draftsList'),
     toast: document.getElementById('toast'),
     themeToggle: document.getElementById('themeToggle'),
-    printContent: document.getElementById('printContent'),
-
-    // PDF Preview Pane
-    previewToggle: document.getElementById('previewToggle'),
-    previewClose: document.getElementById('previewClose'),
-    livePreviewPane: document.getElementById('livePreviewPane'),
-    previewFrame: document.getElementById('previewFrame'),
-    previewLoading: document.getElementById('previewLoading')
+    printContent: document.getElementById('printContent')
   };
 
   // Initialize
@@ -104,19 +92,6 @@
 
     // Theme toggle
     elements.themeToggle.addEventListener('click', () => ThemeManager.toggle());
-
-    // PDF Preview toggle
-    if (elements.previewToggle) {
-      elements.previewToggle.addEventListener('click', togglePdfPreview);
-    }
-    if (elements.previewClose) {
-      elements.previewClose.addEventListener('click', togglePdfPreview);
-    }
-
-    // Restore PDF preview preference
-    if (localStorage.getItem('pdfPreviewEnabled') === 'true') {
-      // Will be enabled when user goes to fill step
-    }
   }
 
   // Category and Template Selection
@@ -174,11 +149,6 @@
     elements.stepFill.style.display = 'none';
     elements.stepPreview.style.display = 'none';
     elements.stepSelect.style.display = 'block';
-
-    // Close PDF preview if open
-    if (pdfPreviewEnabled) {
-      togglePdfPreview();
-    }
   }
 
   function goToFillStep() {
@@ -199,11 +169,6 @@
     elements.stepSelect.style.display = 'none';
     elements.stepFill.style.display = 'none';
     elements.stepPreview.style.display = 'block';
-
-    // Close PDF preview if open
-    if (pdfPreviewEnabled) {
-      togglePdfPreview();
-    }
   }
 
   // Form Field Generation
@@ -419,9 +384,6 @@
 
     // Update live preview
     elements.livePreviewContent.textContent = output;
-
-    // Schedule PDF preview update (debounced)
-    schedulePdfPreviewUpdate();
   }
 
   // Entry Generation
@@ -718,93 +680,6 @@
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-  }
-
-  // ========================================
-  // PDF Preview Manager
-  // ========================================
-
-  function togglePdfPreview() {
-    pdfPreviewEnabled = !pdfPreviewEnabled;
-
-    if (pdfPreviewEnabled) {
-      document.body.classList.add('preview-active');
-      elements.livePreviewPane.classList.add('show');
-      elements.previewToggle.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-        Hide Preview
-      `;
-      updatePdfPreview();
-    } else {
-      document.body.classList.remove('preview-active');
-      elements.livePreviewPane.classList.remove('show');
-      elements.previewToggle.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
-        Live PDF Preview
-      `;
-      // Clean up blob URL
-      if (elements.previewFrame.dataset.blobUrl) {
-        URL.revokeObjectURL(elements.previewFrame.dataset.blobUrl);
-        elements.previewFrame.removeAttribute('src');
-        delete elements.previewFrame.dataset.blobUrl;
-      }
-    }
-
-    localStorage.setItem('pdfPreviewEnabled', pdfPreviewEnabled);
-  }
-
-  function schedulePdfPreviewUpdate() {
-    if (!pdfPreviewEnabled) return;
-
-    if (pdfPreviewDebounceTimer) {
-      clearTimeout(pdfPreviewDebounceTimer);
-    }
-
-    pdfPreviewDebounceTimer = setTimeout(updatePdfPreview, PDF_PREVIEW_DEBOUNCE_MS);
-  }
-
-  function updatePdfPreview() {
-    if (!pdfPreviewEnabled || !currentTemplate) return;
-
-    // Show loading spinner
-    elements.previewLoading.classList.add('show');
-
-    try {
-      // Get current entry text from live preview
-      const entryText = elements.livePreviewContent.textContent;
-
-      // Generate PDF blob
-      const pdfBlob = PDFGenerator.generateBlob({
-        entryText: entryText,
-        marineName: elements.marineName.value || '',
-        marineSSN: elements.marineSSN.value || '',
-        templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
-      });
-
-      if (pdfBlob) {
-        // Revoke old blob URL to prevent memory leaks
-        if (elements.previewFrame.dataset.blobUrl) {
-          URL.revokeObjectURL(elements.previewFrame.dataset.blobUrl);
-        }
-
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        elements.previewFrame.src = blobUrl;
-        elements.previewFrame.dataset.blobUrl = blobUrl;
-      }
-    } catch (error) {
-      console.error('PDF preview generation error:', error);
-    } finally {
-      // Hide loading spinner after a short delay (let PDF render)
-      setTimeout(() => {
-        elements.previewLoading.classList.remove('show');
-      }, 300);
-    }
   }
 
   // Initialize on DOM ready
