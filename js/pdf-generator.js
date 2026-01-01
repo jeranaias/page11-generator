@@ -1,7 +1,7 @@
 /**
  * PDF Generator for NAVMC 118(11) - Administrative Remarks
  * Generates properly formatted Page 11 entries matching official form layout
- * Based on MCO P1070.12K (IRAM) Chapter 4
+ * Based on MCO P1070.12K (IRAM) and actual NAVMC 118(11) (REV. 05-2014)
  */
 
 const PDFGenerator = {
@@ -73,90 +73,68 @@ const PDFGenerator = {
     }
 
     // ========================================
-    // FORM HEADER
+    // FORM HEADER - Matching actual NAVMC 118(11)
     // ========================================
 
-    // Form number - top left
+    // Form number - top left (actual revision)
     pdf.setFont(FONT_HEADER, 'normal');
     pdf.setFontSize(8);
-    pdf.text('NAVMC 118(11) (REV. 12-2024)', ML, y - 15);
+    pdf.text('NAVMC 118(11) (REV. 05-2014) (EF)', ML, y - 15);
 
-    // Privacy Act Statement - top right
+    // Form identifier - top right
     pdf.setFontSize(6);
-    pdf.text('PRIVACY ACT STATEMENT: Authority 5 U.S.C. 301', PW - MR, y - 15, { align: 'right' });
+    pdf.text('SN: 0109-LF-062-8400  U/I: SH', PW - MR, y - 15, { align: 'right' });
 
     // Title block
     pdf.setFont(FONT_HEADER, 'bold');
-    pdf.setFontSize(10);
-    pdf.text('UNITED STATES MARINE CORPS', PW / 2, y, { align: 'center' });
-    y += 16;
-
     pdf.setFontSize(14);
-    pdf.text('ADMINISTRATIVE REMARKS', PW / 2, y, { align: 'center' });
-    y += 10;
-
-    pdf.setFont(FONT_HEADER, 'normal');
-    pdf.setFontSize(8);
-    pdf.text('(Page 11 of the Service Record)', PW / 2, y, { align: 'center' });
-    y += 15;
+    pdf.text('ADMINISTRATIVE REMARKS', PW / 2, y + 5, { align: 'center' });
+    y += 25;
 
     // ========================================
-    // IDENTIFICATION BLOCK
+    // IDENTIFICATION BLOCK - Actual form layout
+    // NAME and SSN only (no GRADE on real form)
     // ========================================
 
     const boxY = y;
-    const boxH = 30;
-    const col1W = 260;
-    const col2W = 100;
-    const col3W = CW - col1W - col2W;
+    const boxH = 32;
+    const nameW = CW * 0.7;  // Name takes ~70%
+    const ssnW = CW - nameW; // SSN takes remainder
 
     pdf.setLineWidth(0.75);
     pdf.setDrawColor(0);
 
     // Draw boxes
-    pdf.rect(ML, boxY, col1W, boxH);
-    pdf.rect(ML + col1W, boxY, col2W, boxH);
-    pdf.rect(ML + col1W + col2W, boxY, col3W, boxH);
+    pdf.rect(ML, boxY, nameW, boxH);
+    pdf.rect(ML + nameW, boxY, ssnW, boxH);
 
-    // Box labels
+    // Box labels (matching actual form)
     pdf.setFont(FONT_HEADER, 'normal');
-    pdf.setFontSize(6);
-    pdf.text('1. NAME (Last, First, Middle Initial)', ML + 2, boxY + 8);
-    pdf.text('2. GRADE', ML + col1W + 2, boxY + 8);
-    pdf.text('3. SSN (Last 4)', ML + col1W + col2W + 2, boxY + 8);
+    pdf.setFontSize(7);
+    pdf.text('NAME (last, first, middle)', ML + 3, boxY + 10);
+    pdf.text('SSN', ML + nameW + 3, boxY + 10);
 
     // Box values
-    pdf.setFont(FONT_BODY, 'bold');
+    pdf.setFont(FONT_BODY, 'normal');
     pdf.setFontSize(11);
 
     if (options.marineName) {
-      pdf.text(options.marineName, ML + 4, boxY + 22);
-    }
-    if (options.marineGrade) {
-      pdf.text(options.marineGrade, ML + col1W + 4, boxY + 22);
+      pdf.text(options.marineName.toUpperCase(), ML + 5, boxY + 24);
     }
     if (options.marineSSN) {
-      pdf.text('XXX-XX-' + options.marineSSN, ML + col1W + col2W + 4, boxY + 22);
+      // Show full SSN format with last 4
+      pdf.text('XXX-XX-' + options.marineSSN, ML + nameW + 5, boxY + 24);
     }
 
-    y = boxY + boxH + 8;
+    y = boxY + boxH + 5;
 
     // ========================================
-    // REMARKS SECTION HEADER
+    // REMARKS SECTION - Simple header line
     // ========================================
 
     pdf.setLineWidth(1);
     pdf.line(ML, y, PW - MR, y);
-    y += 12;
-
-    pdf.setFont(FONT_HEADER, 'bold');
-    pdf.setFontSize(9);
-    pdf.text('4. CHRONOLOGICAL RECORD OF ADMINISTRATIVE REMARKS', PW / 2, y, { align: 'center' });
-    y += 8;
-
-    pdf.setLineWidth(0.5);
-    pdf.line(ML, y, PW - MR, y);
-    y += 15;
+    y += 18;
 
     // ========================================
     // ENTRY CONTENT
@@ -166,7 +144,6 @@ const PDFGenerator = {
     pdf.setFontSize(FONT_SIZE);
 
     const entryLines = options.entryText.split('\n');
-    const contentStartY = y;
 
     entryLines.forEach((line, idx) => {
       if (line.trim().length === 0) {
@@ -222,16 +199,12 @@ const PDFGenerator = {
       pdf.text('NAVMC 118(11)', ML, footerY);
 
       // Page number - center
-      pdf.text(`Page ${i} of ${totalPages}`, PW / 2, footerY, { align: 'center' });
+      if (totalPages > 1) {
+        pdf.text(`Page ${i} of ${totalPages}`, PW / 2, footerY, { align: 'center' });
+      }
 
-      // Date - right
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
-      pdf.text(`Generated: ${dateStr}`, PW - MR, footerY, { align: 'right' });
+      // Edition note - right
+      pdf.text('REV. 05-2014', PW - MR, footerY, { align: 'right' });
     }
 
     // ========================================
@@ -273,7 +246,6 @@ const PDFGenerator = {
   generateFilename(templateName) {
     const now = new Date();
     const date = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const time = now.toTimeString().slice(0, 5).replace(':', '');
     const name = (templateName || 'entry')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')

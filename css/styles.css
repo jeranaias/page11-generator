@@ -756,6 +756,9 @@ body {
   .marine-info-grid {
     grid-template-columns: 2fr 1fr 1fr;
   }
+  .marine-info-grid--two {
+    grid-template-columns: 2fr 1fr;
+  }
 }
 
 /* ==========================================================================

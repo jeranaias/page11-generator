@@ -27,9 +27,8 @@
     formattedDate: document.getElementById('formattedDate'),
     nextBtn: document.getElementById('nextBtn'),
 
-    // Marine info (for PDF)
+    // Marine info (for PDF) - matches actual NAVMC 118(11) form
     marineName: document.getElementById('marineName'),
-    marineGrade: document.getElementById('marineGrade'),
     marineSSN: document.getElementById('marineSSN'),
 
     // Template fill
@@ -502,8 +501,7 @@
     try {
       PDFGenerator.generate({
         entryText: generatedEntry,
-        marineName: elements.marineName.value.toUpperCase() || '',
-        marineGrade: elements.marineGrade.value.toUpperCase() || '',
+        marineName: elements.marineName.value || '',
         marineSSN: elements.marineSSN.value || '',
         templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
       });

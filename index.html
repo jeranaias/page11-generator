@@ -121,17 +121,13 @@
         <p class="help-text" id="formattedDate"></p>
       </div>
 
-      <!-- Marine Identification -->
+      <!-- Marine Identification (matches actual NAVMC 118(11) form) -->
       <div class="marine-info-card">
         <p class="marine-info-label">Marine Information (for PDF form header)</p>
-        <div class="marine-info-grid">
+        <div class="marine-info-grid marine-info-grid--two">
           <div class="form-group">
-            <label class="label" for="marineName">Name (Last, First MI)</label>
-            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN A" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label class="label" for="marineGrade">Grade</label>
-            <input type="text" class="input" id="marineGrade" placeholder="LCpl" autocomplete="off">
+            <label class="label" for="marineName">NAME (last, first, middle)</label>
+            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN ADAM" autocomplete="off">
           </div>
           <div class="form-group">
             <label class="label" for="marineSSN">SSN (Last 4)</label>
