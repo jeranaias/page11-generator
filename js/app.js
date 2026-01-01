@@ -182,7 +182,19 @@
   }
 
   function goToFillStep() {
-    if (!currentTemplate) return;
+    // Validate category selection
+    if (!currentCategory) {
+      showToast('Please select a category first', 'error');
+      elements.categorySelect.focus();
+      return;
+    }
+
+    // Validate template selection
+    if (!currentTemplate) {
+      showToast('Please select an entry type', 'error');
+      elements.templateSelect.focus();
+      return;
+    }
 
     elements.stepSelect.style.display = 'none';
     elements.stepPreview.style.display = 'none';
@@ -668,6 +680,8 @@
           }
         }
       });
+      // Update live preview after all values are filled
+      updateLivePreview();
     }, 100);
 
     showToast('Draft loaded', 'success');
@@ -696,6 +710,10 @@
     updateFormattedDate();
     elements.nextBtn.disabled = true;
     elements.templateFields.innerHTML = '';
+
+    // Clear marine info fields
+    elements.marineName.value = '';
+    elements.marineSSN.value = '';
 
     // Go to select step
     goToSelectStep();
