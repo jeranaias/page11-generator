@@ -724,32 +724,32 @@
   // PDF Preview Manager
   // ========================================
 
+  /**
+   * Check if device is mobile (narrow screen)
+   */
+  function isMobileDevice() {
+    return window.innerWidth <= 1024;
+  }
+
+  /**
+   * Toggle the live PDF preview pane
+   */
   function togglePdfPreview() {
     pdfPreviewEnabled = !pdfPreviewEnabled;
 
     if (pdfPreviewEnabled) {
       document.body.classList.add('preview-active');
       elements.livePreviewPane.classList.add('show');
-      elements.previewToggle.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-        Hide Preview
-      `;
+      elements.previewToggle.textContent = 'Hide Preview';
+      elements.previewToggle.classList.add('active');
       updatePdfPreview();
     } else {
       document.body.classList.remove('preview-active');
       elements.livePreviewPane.classList.remove('show');
-      elements.previewToggle.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
-        Live PDF Preview
-      `;
+      elements.previewToggle.textContent = 'Live Preview';
+      elements.previewToggle.classList.remove('active');
       // Clean up blob URL
-      if (elements.previewFrame.dataset.blobUrl) {
+      if (elements.previewFrame && elements.previewFrame.dataset.blobUrl) {
         URL.revokeObjectURL(elements.previewFrame.dataset.blobUrl);
         elements.previewFrame.removeAttribute('src');
         delete elements.previewFrame.dataset.blobUrl;
@@ -759,6 +759,9 @@
     localStorage.setItem('pdfPreviewEnabled', pdfPreviewEnabled);
   }
 
+  /**
+   * Schedule a preview update (debounced)
+   */
   function schedulePdfPreviewUpdate() {
     if (!pdfPreviewEnabled) return;
 
@@ -769,13 +772,23 @@
     pdfPreviewDebounceTimer = setTimeout(updatePdfPreview, PDF_PREVIEW_DEBOUNCE_MS);
   }
 
+  /**
+   * Update the live PDF preview
+   */
   function updatePdfPreview() {
     if (!pdfPreviewEnabled || !currentTemplate) return;
 
-    // Show loading spinner
-    elements.previewLoading.classList.add('show');
+    const previewFrame = elements.previewFrame;
+    const previewLoading = elements.previewLoading;
+
+    if (!previewFrame) return;
 
     try {
+      // Show loading indicator
+      if (previewLoading) {
+        previewLoading.style.display = 'flex';
+      }
+
       // Get current entry text from live preview
       const entryText = elements.livePreviewContent.textContent;
 
@@ -788,21 +801,25 @@
       });
 
       if (pdfBlob) {
+        // Create blob URL
+        const blobUrl = URL.createObjectURL(pdfBlob);
+
         // Revoke old blob URL to prevent memory leaks
-        if (elements.previewFrame.dataset.blobUrl) {
-          URL.revokeObjectURL(elements.previewFrame.dataset.blobUrl);
+        if (previewFrame.dataset.blobUrl) {
+          URL.revokeObjectURL(previewFrame.dataset.blobUrl);
         }
 
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        elements.previewFrame.src = blobUrl;
-        elements.previewFrame.dataset.blobUrl = blobUrl;
+        previewFrame.src = blobUrl;
+        previewFrame.dataset.blobUrl = blobUrl;
       }
     } catch (error) {
       console.error('PDF preview generation error:', error);
     } finally {
-      // Hide loading spinner after a short delay (let PDF render)
+      // Hide loading indicator after a short delay
       setTimeout(() => {
-        elements.previewLoading.classList.remove('show');
+        if (previewLoading) {
+          previewLoading.style.display = 'none';
+        }
       }, 300);
     }
   }
