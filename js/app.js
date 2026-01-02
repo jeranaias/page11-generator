@@ -647,8 +647,13 @@ function installPWA() {
 
     generatedEntry = output;
 
-    // Display preview
-    elements.previewContent.textContent = output;
+    // Display preview using new Page 11 format
+    const previewHTML = PDFGenerator.generatePreviewHTML({
+      entryText: output,
+      marineName: elements.marineName.value || '',
+      marineEDIPI: elements.marineSSN.value || ''
+    });
+    elements.previewContent.innerHTML = previewHTML;
     goToPreviewStep();
   }
 
@@ -658,7 +663,7 @@ function installPWA() {
       PDFGenerator.generate({
         entryText: generatedEntry,
         marineName: elements.marineName.value || '',
-        marineSSN: elements.marineSSN.value || '',
+        marineEDIPI: elements.marineSSN.value || '',
         templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
       });
       showToast('PDF downloaded!', 'success');
@@ -930,7 +935,7 @@ function installPWA() {
       const pdfBlob = PDFGenerator.generateBlob({
         entryText: entryText,
         marineName: elements.marineName.value || '',
-        marineSSN: elements.marineSSN.value || '',
+        marineEDIPI: elements.marineSSN.value || '',
         templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
       });
 
