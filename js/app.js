@@ -724,6 +724,12 @@ function installPWA() {
 
     // Set selections
     elements.categorySelect.value = template.category;
+
+    // Update category card visual state
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+    const activeCard = document.querySelector(`.category-card[data-category="${template.category}"]`);
+    if (activeCard) activeCard.classList.add('active');
+
     handleCategoryChange();
     elements.templateSelect.value = draft.templateId;
     handleTemplateChange();

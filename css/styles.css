@@ -17,9 +17,10 @@
   --secondary-dark: #002244;
   --secondary-light: #004488;
 
-  /* Gold Accent */
-  --gold: #FFC300;
-  --gold-dark: #D4A000;
+  /* Gold Accent - muted military gold */
+  --gold: #b89d5b;
+  --gold-light: #d4b86a;
+  --gold-dark: #9a824a;
 
   /* Neutrals */
   --white: #FFFFFF;
@@ -171,6 +172,7 @@
 
   --secondary: #FF0000;
   --gold: #FF0000;
+  --gold-light: #FF3333;
 
   --bg-primary: #000000;
   --bg-secondary: #0A0A0A;
@@ -186,10 +188,31 @@
   --border-medium: #660000;
   --border-dark: #990000;
 
+  --gray-100: #0a0000;
+  --gray-200: #1a0000;
+
   --success: #FF0000;
   --warning: #FF0000;
   --error: #FF0000;
   --info: #FF0000;
+}
+
+[data-theme="night"] .header {
+  background: linear-gradient(135deg, #1a0000 0%, #2a0000 100%);
+}
+
+[data-theme="night"] .category-card {
+  background: #0a0000;
+  border-color: #330000;
+  color: #FF0000;
+}
+
+[data-theme="night"] .category-card:hover {
+  border-color: #FF0000;
+}
+
+[data-theme="night"] .category-card__desc {
+  color: #990000;
 }
 
 /* ==========================================================================
@@ -285,7 +308,7 @@ body {
 }
 
 .header__subtitle {
-  color: var(--gold);
+  color: var(--gold-light);
   font-size: 0.85rem;
   font-weight: var(--font-normal);
 }
@@ -339,8 +362,17 @@ body {
   transform: scale(1.05);
 }
 
-.theme-icon {
-  font-size: 1.2rem;
+/* Theme icon - changes based on current theme */
+.theme-icon::before {
+  content: "\2600"; /* Sun for light mode */
+}
+
+[data-theme="dark"] .theme-icon::before {
+  content: "\1F319"; /* Moon for dark mode */
+}
+
+[data-theme="night"] .theme-icon::before {
+  content: "\2B50"; /* Star for night mode */
 }
 
 /* ==========================================================================
@@ -397,6 +429,32 @@ body {
   height: 16px;
   background: var(--gold);
   border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Summary element as section title - handle disclosure marker */
+summary.section-title {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--space-4);
+  margin: calc(-1 * var(--space-4));
+  margin-bottom: 0;
+}
+
+summary.section-title::-webkit-details-marker {
+  display: none;
+}
+
+summary.section-title::after {
+  content: '+';
+  margin-left: auto;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+details[open] > summary.section-title::after {
+  content: '−';
 }
 
 /* Category Selection Cards */
