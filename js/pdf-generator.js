@@ -312,39 +312,57 @@ const PDFGenerator = {
   },
 
   /**
-   * Generate preview HTML that matches PDF layout
+   * Generate preview HTML that matches PDF layout EXACTLY
+   * All elements absolutely positioned to match PDF coordinates:
+   * - Page: 612pt x 792pt
+   * - G-box: top-right at 36pt from edges, 45pt square
+   * - Title: y=96pt centered, underlined
+   * - Header line: y=111pt
+   * - Content: starts y=126pt
+   * - Footer line: y=697pt
+   * - NAME/EDIPI boxes: y=702pt, 35pt tall
+   * - Bottom row: y=752pt
+   * - FOUO: y=772pt
    */
   generatePreviewHTML(options) {
-    const escapedName = this.escapeHtml(options.marineName || '');
+    const escapedName = this.escapeHtml(options.marineName || '').toUpperCase();
     const escapedEDIPI = this.escapeHtml(options.marineEDIPI || options.marineSSN || '');
     const escapedEntry = this.escapeHtml(options.entryText || '').replace(/\n/g, '<br>');
 
     return `
       <div class="page11-preview">
-        <div class="page11-header">
-          <div class="g-code-box">G</div>
-          <h2 class="page11-title">ADMINISTRATIVE REMARKS (1070)</h2>
-        </div>
+        <!-- G code box - top right -->
+        <div class="g-code-box">G</div>
+
+        <!-- Title - centered with underline -->
+        <div class="page11-title">ADMINISTRATIVE REMARKS (1070)</div>
+
+        <!-- Header line -->
+        <div class="page11-header-line"></div>
+
+        <!-- Entry content -->
         <div class="page11-content">
           <div class="entry-text">${escapedEntry}</div>
         </div>
+
+        <!-- Footer -->
         <div class="page11-footer">
           <div class="footer-boxes">
             <div class="name-box">
-              <span class="box-value">${escapedName}</span>
-              <span class="box-label">NAME (last, first, middle)</span>
+              <div class="box-value">${escapedName}</div>
+              <div class="box-label">NAME (last, first, middle)</div>
             </div>
             <div class="edipi-box">
-              <span class="box-value">${escapedEDIPI}</span>
-              <span class="box-label">EDIPI</span>
+              <div class="box-value">${escapedEDIPI}</div>
+              <div class="box-label">EDIPI</div>
             </div>
           </div>
           <div class="footer-bottom">
             <div class="form-info">
-              <strong>NAVMC 118(11) (REV. 05-2014) (EF)</strong><br>
+              <strong>NAVMC 118(11) (REV. 05-2014) (EF)</strong>
               <span>PREVIOUS EDITIONS ARE OBSOLETE</span>
             </div>
-            <div class="page-number">11. <span class="page-line">____</span></div>
+            <div class="page-number">11.<span class="page-line"></span></div>
           </div>
           <div class="fouo-notice">FOUO - Privacy sensitive when filled in</div>
         </div>

@@ -1100,55 +1100,100 @@ body.preview-active .footer {
 }
 
 /* ==========================================================================
-   Page 11 Preview - Matches actual NAVMC 118(11) format
+   Page 11 Preview - PIXEL-PERFECT match to PDF output
+   PDF coordinates (in points from page origin):
+   - Page: 612pt x 792pt (Letter)
+   - G-box: top-right at (531, 36), 45pt x 45pt
+   - Title: y=96pt (centered), underlined
+   - Header line: y=111pt
+   - Content starts: y=126pt
+   - Footer line: y=697pt
+   - NAME/EDIPI boxes: y=702pt, 35pt tall
+   - Bottom row: y=752pt
+   - FOUO: y=772pt
    ========================================================================== */
+
+/* Wrapper - centers the page preview with scrolling */
+.preview-content {
+  background: #888;
+  min-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* The actual page - exact Letter size with all elements absolutely positioned */
 .page11-preview {
+  /* Exact Letter size: 612pt x 792pt */
+  width: 612pt;
+  height: 792pt;
+  min-height: 792pt;
+  max-height: 792pt;
   background: #FFFFFF;
   color: #000000;
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 11pt;
-  line-height: 1.4;
-  padding: 36pt;
-  min-height: 100%;
   position: relative;
   box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.page11-header {
-  position: relative;
-  margin-bottom: 20pt;
-  padding-bottom: 15pt;
-  border-bottom: 1px solid #000;
-}
-
+/* G code box - exact position: top-right corner at (576pt from left, 36pt from top) */
 .g-code-box {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 36pt;
+  right: 36pt;
   width: 45pt;
   height: 45pt;
-  border: 2px solid #000;
+  border: 1.5pt solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 28pt;
+  font-size: 32pt;
   font-weight: bold;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
+/* Title - baseline at y=96pt from page top (top of text ~84pt for 12pt font) */
 .page11-title {
+  position: absolute;
+  top: 84pt; /* PDF baseline at 96pt minus ~12pt font ascent */
+  left: 36pt;
+  right: 36pt;
   text-align: center;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 12pt;
   font-weight: bold;
-  margin: 50pt 0 0 0;
+  margin: 0;
   padding: 0;
   text-decoration: underline;
+  line-height: 1;
 }
 
+/* Header line - at y=111pt */
+.page11-header-line {
+  position: absolute;
+  top: 111pt;
+  left: 36pt;
+  right: 36pt;
+  border-top: 0.5pt solid #000;
+}
+
+/* Content area - first baseline at y=126pt (top ~118pt for 11pt Times) */
 .page11-content {
-  min-height: 450pt;
-  padding: 10pt 0;
+  position: absolute;
+  top: 118pt; /* Adjusted so first text baseline lands at ~126pt */
+  left: 36pt;
+  right: 36pt;
+  bottom: 100pt; /* Leave space for footer */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  line-height: 14pt;
+  overflow: hidden;
 }
 
 .page11-content .entry-text {
@@ -1156,97 +1201,134 @@ body.preview-active .footer {
   word-wrap: break-word;
 }
 
+/* Footer container - starts at y=697pt */
 .page11-footer {
   position: absolute;
-  bottom: 20pt;
+  top: 697pt;
   left: 36pt;
   right: 36pt;
-  border-top: 1px solid #000;
-  padding-top: 8pt;
+  bottom: 0;
 }
 
+/* Line above footer boxes - at y=697pt */
+.page11-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 0.5pt solid #000;
+}
+
+/* NAME and EDIPI boxes container - starts 5pt below line (y=702pt) */
 .footer-boxes {
+  position: absolute;
+  top: 5pt;
+  left: 0;
+  right: 0;
   display: flex;
-  margin-bottom: 8pt;
+  height: 35pt;
 }
 
+/* Box styling - exact heights and borders */
 .name-box,
 .edipi-box {
-  border: 1px solid #000;
+  border: 0.75pt solid #000;
   height: 35pt;
   position: relative;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
+/* NAME box: 75% of 540pt = 405pt */
 .name-box {
-  flex: 3;
+  width: 405pt;
+  flex-shrink: 0;
 }
 
+/* EDIPI box: 25% of 540pt = 135pt */
 .edipi-box {
-  flex: 1;
+  width: 135pt;
+  flex-shrink: 0;
 }
 
+/* Value text inside boxes - Times 11pt */
 .box-value {
-  padding: 3pt 5pt;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 11pt;
+  padding: 2pt 5pt;
   flex: 1;
+  text-transform: uppercase;
 }
 
+/* Labels at bottom of boxes - Helvetica 8pt */
 .box-label {
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 7pt;
+  font-size: 8pt;
   text-align: center;
-  padding-bottom: 2pt;
+  padding-bottom: 3pt;
   color: #000;
+  line-height: 1;
 }
 
+/* Bottom row - at y=752pt (55pt from footer top) */
 .footer-bottom {
+  position: absolute;
+  top: 55pt; /* 5pt + 35pt boxes + 15pt gap */
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 10pt;
 }
 
+/* Form info - left side */
 .form-info {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 8pt;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
 .form-info strong {
   font-weight: bold;
+  display: block;
 }
 
 .form-info span {
   font-size: 7pt;
+  display: block;
+  margin-top: 2pt;
 }
 
+/* Page number - center */
 .page-number {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-family: Helvetica, Arial, sans-serif;
   font-size: 10pt;
+  display: flex;
+  align-items: baseline;
 }
 
 .page-line {
   display: inline-block;
-  width: 30pt;
-  border-bottom: 1px solid #000;
+  width: 35pt;
+  border-bottom: 0.5pt solid #000;
   margin-left: 5pt;
 }
 
+/* FOUO notice - at y=772pt (75pt from footer top = 792-20) */
 .fouo-notice {
+  position: absolute;
+  top: 75pt; /* 697 + 75 = 772pt from page top */
+  left: 0;
+  right: 0;
   text-align: center;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 8pt;
   font-weight: bold;
-  margin-top: 5pt;
-}
-
-/* Preview container styling */
-.preview-content {
-  background: #FFFFFF;
-  height: 100%;
-  overflow-y: auto;
 }
 
 /* ==========================================================================

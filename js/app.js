@@ -63,7 +63,7 @@ function installPWA() {
 
     // Marine info (for PDF) - matches actual NAVMC 118(11) form
     marineName: document.getElementById('marineName'),
-    marineSSN: document.getElementById('marineSSN'),
+    marineEDIPI: document.getElementById('marineEDIPI'),
 
     // Template fill
     templateTitle: document.getElementById('templateTitle'),
@@ -651,7 +651,7 @@ function installPWA() {
     const previewHTML = PDFGenerator.generatePreviewHTML({
       entryText: output,
       marineName: elements.marineName.value || '',
-      marineEDIPI: elements.marineSSN.value || ''
+      marineEDIPI: elements.marineEDIPI.value || ''
     });
     elements.previewContent.innerHTML = previewHTML;
     goToPreviewStep();
@@ -663,7 +663,7 @@ function installPWA() {
       PDFGenerator.generate({
         entryText: generatedEntry,
         marineName: elements.marineName.value || '',
-        marineEDIPI: elements.marineSSN.value || '',
+        marineEDIPI: elements.marineEDIPI.value || '',
         templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
       });
       showToast('PDF downloaded!', 'success');
@@ -834,7 +834,7 @@ function installPWA() {
 
     // Clear marine info fields
     elements.marineName.value = '';
-    elements.marineSSN.value = '';
+    elements.marineEDIPI.value = '';
 
     // Go to select step
     goToSelectStep();
@@ -935,7 +935,7 @@ function installPWA() {
       const pdfBlob = PDFGenerator.generateBlob({
         entryText: entryText,
         marineName: elements.marineName.value || '',
-        marineEDIPI: elements.marineSSN.value || '',
+        marineEDIPI: elements.marineEDIPI.value || '',
         templateName: currentTemplate ? currentTemplate.name : 'Page 11 Entry'
       });
 
