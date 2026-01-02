@@ -37,6 +37,7 @@ function installPWA() {
   let currentTemplate = null;
   let currentValues = {};
   let generatedEntry = '';
+  let currentEntryText = ''; // Stores the live preview text for PDF generation
 
   // PDF Preview State
   let pdfPreviewEnabled = false;
@@ -70,8 +71,11 @@ function installPWA() {
     backBtn: document.getElementById('backBtn'),
     generateBtn: document.getElementById('generateBtn'),
 
-    // Live Preview
-    livePreviewContent: document.getElementById('livePreviewContent'),
+    // Menu
+    menuToggle: document.getElementById('menuToggle'),
+    menuDropdown: document.getElementById('menuDropdown'),
+    loadDraftBtn: document.getElementById('loadDraftBtn'),
+    clearFormBtn: document.getElementById('clearFormBtn'),
 
     // Preview
     previewBox: document.getElementById('previewBox'),
@@ -152,9 +156,41 @@ function installPWA() {
       elements.previewClose.addEventListener('click', togglePdfPreview);
     }
 
+    // Menu toggle
+    if (elements.menuToggle) {
+      elements.menuToggle.addEventListener('click', toggleMenu);
+    }
+    if (elements.loadDraftBtn) {
+      elements.loadDraftBtn.addEventListener('click', () => {
+        toggleMenu();
+        scrollToDrafts();
+      });
+    }
+    if (elements.clearFormBtn) {
+      elements.clearFormBtn.addEventListener('click', () => {
+        toggleMenu();
+        startNewEntry();
+      });
+    }
+
     // Restore PDF preview preference
     if (localStorage.getItem('pdfPreviewEnabled') === 'true') {
       // Will be enabled when user goes to fill step
+    }
+  }
+
+  function toggleMenu() {
+    if (elements.menuDropdown) {
+      const isHidden = elements.menuDropdown.style.display === 'none';
+      elements.menuDropdown.style.display = isHidden ? 'block' : 'none';
+    }
+  }
+
+  function scrollToDrafts() {
+    if (elements.draftsSection && elements.draftsSection.style.display !== 'none') {
+      elements.draftsSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      showToast('No saved drafts', 'info');
     }
   }
 
@@ -492,8 +528,8 @@ function installPWA() {
       output = output.replace('[signature_lines]', sigLines);
     }
 
-    // Update live preview
-    elements.livePreviewContent.textContent = output;
+    // Store the entry text for PDF preview
+    currentEntryText = output;
 
     // Schedule PDF preview update (debounced)
     schedulePdfPreviewUpdate();
@@ -777,6 +813,7 @@ function installPWA() {
     currentTemplate = null;
     currentValues = {};
     generatedEntry = '';
+    currentEntryText = '';
 
     // Reset form
     elements.categorySelect.value = '';
@@ -886,8 +923,8 @@ function installPWA() {
         previewLoading.style.display = 'flex';
       }
 
-      // Get current entry text from live preview
-      const entryText = elements.livePreviewContent.textContent;
+      // Get current entry text
+      const entryText = currentEntryText;
 
       // Generate PDF blob
       const pdfBlob = PDFGenerator.generateBlob({

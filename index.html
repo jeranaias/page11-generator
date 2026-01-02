@@ -130,6 +130,16 @@
         </button>
       </div>
 
+      <!-- Quick Actions Toolbar -->
+      <div class="quick-toolbar">
+        <button type="button" class="btn btn--primary" id="previewToggle">Live Preview</button>
+        <button type="button" class="btn btn--secondary" id="menuToggle">Menu &#9662;</button>
+      </div>
+      <div id="menuDropdown" class="menu-dropdown" style="display: none;">
+        <button type="button" class="menu-item" id="loadDraftBtn">Load Saved Draft</button>
+        <button type="button" class="menu-item" id="clearFormBtn">Clear Form</button>
+      </div>
+
       <!-- Hidden select for JS compatibility -->
       <select class="visually-hidden" id="categorySelect" aria-hidden="true">
         <option value="">Select a category...</option>
@@ -179,28 +189,14 @@
     <section id="step-fill" class="card card--elevated" style="display: none;">
       <div class="card__header">
         <h2 class="section-title" id="templateTitle">FILL TEMPLATE</h2>
-        <p class="help-text">Complete the required fields - preview updates live</p>
+        <p class="help-text">Complete the required fields - use Live Preview to see your entry</p>
       </div>
 
-      <div class="template-fill-grid">
-        <div class="template-fields-col">
-          <div id="templateFields"></div>
-        </div>
-
-        <div class="template-preview-col">
-          <div class="live-preview-header">
-            <span class="live-preview-label">Live Preview</span>
-          </div>
-          <div class="preview-box live-preview-box" id="livePreviewBox">
-            <pre id="livePreviewContent"></pre>
-          </div>
-        </div>
-      </div>
+      <div id="templateFields"></div>
 
       <div class="flex gap-3 justify-end mt-4">
         <button class="btn btn--outline" id="backBtn">Back</button>
-        <button class="btn btn--secondary" id="previewToggle">Live Preview</button>
-        <button class="btn btn--primary" id="generateBtn">Generate & Download PDF</button>
+        <button class="btn btn--primary" id="generateBtn">Generate &amp; Download PDF</button>
       </div>
     </section>
 

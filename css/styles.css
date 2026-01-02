@@ -510,6 +510,53 @@ details[open] > summary.section-title::after {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Quick Actions Toolbar */
+.quick-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .quick-toolbar {
+    flex-direction: column;
+  }
+
+  .quick-toolbar .btn {
+    width: 100%;
+  }
+}
+
+/* Menu Dropdown */
+.menu-dropdown {
+  margin-top: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 8px 0;
+  box-shadow: var(--shadow-md);
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.menu-item:hover {
+  background: var(--bg-secondary);
+  color: var(--primary);
+}
+
 /* Visually hidden but accessible */
 .visually-hidden {
   position: absolute;
@@ -756,67 +803,6 @@ details[open] > summary.section-title::after {
   line-height: 1.6;
   color: var(--text-primary);
   margin: 0;
-}
-
-/* ==========================================================================
-   Live Preview Layout
-   ========================================================================== */
-.template-fill-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-6);
-}
-
-@media (min-width: 900px) {
-  .template-fill-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.template-fields-col {
-  min-width: 0;
-}
-
-.template-preview-col {
-  min-width: 0;
-}
-
-.live-preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-2);
-}
-
-.live-preview-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.live-preview-box {
-  min-height: 400px;
-  max-height: 600px;
-  overflow-y: auto;
-  position: sticky;
-  top: var(--space-4);
-}
-
-.live-preview-box pre {
-  font-size: var(--text-xs);
-}
-
-@media (max-width: 899px) {
-  .template-preview-col {
-    order: -1;
-  }
-
-  .live-preview-box {
-    min-height: 200px;
-    max-height: 300px;
-  }
 }
 
 /* ==========================================================================

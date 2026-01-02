@@ -3,7 +3,7 @@
  * Enables offline functionality
  */
 
-const CACHE_NAME = 'page11-generator-v11';
+const CACHE_NAME = 'page11-generator-v12';
 const urlsToCache = [
   '/',
   '/index.html',
