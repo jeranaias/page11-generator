@@ -52,6 +52,7 @@ function installPWA() {
     draftsSection: document.getElementById('drafts-section'),
 
     // Category selection
+    categoryCards: document.getElementById('categoryCards'),
     categorySelect: document.getElementById('categorySelect'),
     templateSelectGroup: document.getElementById('templateSelectGroup'),
     templateSelect: document.getElementById('templateSelect'),
@@ -112,7 +113,12 @@ function installPWA() {
   }
 
   function bindEvents() {
-    // Category selection
+    // Category cards
+    if (elements.categoryCards) {
+      elements.categoryCards.addEventListener('click', handleCategoryCardClick);
+    }
+
+    // Category selection (fallback select, kept for compatibility)
     elements.categorySelect.addEventListener('change', handleCategoryChange);
     elements.templateSelect.addEventListener('change', handleTemplateChange);
     elements.entryDate.addEventListener('change', updateFormattedDate);
@@ -153,6 +159,22 @@ function installPWA() {
   }
 
   // Category and Template Selection
+  function handleCategoryCardClick(e) {
+    const card = e.target.closest('.category-card');
+    if (!card) return;
+
+    const category = card.dataset.category;
+    if (!category) return;
+
+    // Update visual state
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+
+    // Sync with hidden select and trigger change
+    elements.categorySelect.value = category;
+    handleCategoryChange();
+  }
+
   function handleCategoryChange() {
     const category = elements.categorySelect.value;
     currentCategory = category;
@@ -758,6 +780,9 @@ function installPWA() {
     updateFormattedDate();
     elements.nextBtn.disabled = true;
     elements.templateFields.innerHTML = '';
+
+    // Clear category card selection
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
 
     // Clear marine info fields
     elements.marineName.value = '';
