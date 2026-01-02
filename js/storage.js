@@ -112,32 +112,48 @@ const Storage = {
 };
 
 // Theme management
+// Dark mode is default (no data-theme attribute)
+// Light mode = data-theme="light"
+// Night mode = data-theme="night"
 const ThemeManager = {
   STORAGE_KEY: 'usmc-tools-theme',
 
   init() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
+    if (saved && saved !== 'dark') {
+      // Only set attribute for non-dark themes
       this.setTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      this.setTheme('dark');
+    } else {
+      // Dark is default - remove any attribute and save preference
+      document.documentElement.removeAttribute('data-theme');
+      if (!saved) {
+        localStorage.setItem(this.STORAGE_KEY, 'dark');
+      }
     }
   },
 
   setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      // Dark is default - remove attribute
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
     localStorage.setItem(this.STORAGE_KEY, theme);
   },
 
   toggle() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const themes = ['light', 'dark', 'night'];
+    // Cycle: dark → light → night → dark
+    const current = this.getCurrent();
+    const themes = ['dark', 'light', 'night'];
     const nextIndex = (themes.indexOf(current) + 1) % themes.length;
     this.setTheme(themes[nextIndex]);
   },
 
   getCurrent() {
-    return document.documentElement.getAttribute('data-theme') || 'light';
+    const attr = document.documentElement.getAttribute('data-theme');
+    // No attribute means dark mode (default)
+    return attr || 'dark';
   }
 };
 
