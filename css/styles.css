@@ -1100,22 +1100,13 @@ body.preview-active .footer {
 }
 
 /* ==========================================================================
-   Page 11 Preview - PIXEL-PERFECT match to PDF output
-   PDF coordinates (in points from page origin):
-   - Page: 612pt x 792pt (Letter)
-   - G-box: top-right at (531, 36), 45pt x 45pt
-   - Title: y=96pt (centered), underlined
-   - Header line: y=111pt
-   - Content starts: y=126pt
-   - Footer line: y=697pt
-   - NAME/EDIPI boxes: y=702pt, 35pt tall
-   - Bottom row: y=752pt
-   - FOUO: y=772pt
+   Page 11 Preview - Matches actual NAVMC 118(11) (REV. 05-2014) exactly
+   Based on sample PDF provided
    ========================================================================== */
 
 /* Wrapper - centers the page preview with scrolling */
 .preview-content {
-  background: #888;
+  background: #666;
   min-height: 100%;
   overflow-y: auto;
   display: flex;
@@ -1124,75 +1115,81 @@ body.preview-active .footer {
   padding: 20px;
 }
 
-/* The actual page - exact Letter size with all elements absolutely positioned */
+/* The actual page - exact Letter size */
 .page11-preview {
-  /* Exact Letter size: 612pt x 792pt */
-  width: 612pt;
-  height: 792pt;
-  min-height: 792pt;
-  max-height: 792pt;
+  width: 8.5in;
+  height: 11in;
+  min-height: 11in;
+  max-height: 11in;
   background: #FFFFFF;
   color: #000000;
   position: relative;
   box-sizing: border-box;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
   overflow: hidden;
   flex-shrink: 0;
 }
 
-/* G code box - exact position: top-right corner at (576pt from left, 36pt from top) */
+/* G code box - top right corner, thick border */
 .g-code-box {
   position: absolute;
-  top: 36pt;
-  right: 36pt;
-  width: 45pt;
-  height: 45pt;
-  border: 1.5pt solid #000;
+  top: 0.4in;
+  right: 0.5in;
+  width: 0.65in;
+  height: 0.65in;
+  border: 2pt solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 32pt;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 36pt;
   font-weight: bold;
   line-height: 1;
   box-sizing: border-box;
 }
 
-/* Title - baseline at y=96pt from page top (top of text ~84pt for 12pt font) */
+/* Title - centered, bold, with underline below */
 .page11-title {
   position: absolute;
-  top: 84pt; /* PDF baseline at 96pt minus ~12pt font ascent */
-  left: 36pt;
-  right: 36pt;
+  top: 1.1in;
+  left: 0;
+  right: 0;
   text-align: center;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12pt;
   font-weight: bold;
-  margin: 0;
-  padding: 0;
-  text-decoration: underline;
-  line-height: 1;
+  letter-spacing: 0.5pt;
 }
 
-/* Header line - at y=111pt */
+/* Underline under title - separate element */
+.page11-title::after {
+  content: '';
+  display: block;
+  width: 240pt;
+  height: 0;
+  border-bottom: 1pt solid #000;
+  margin: 3pt auto 0 auto;
+}
+
+/* Header line - full width line below title */
 .page11-header-line {
   position: absolute;
-  top: 111pt;
-  left: 36pt;
-  right: 36pt;
-  border-top: 0.5pt solid #000;
+  top: 1.4in;
+  left: 0.5in;
+  right: 0.5in;
+  border-top: 0.75pt solid #000;
 }
 
-/* Content area - first baseline at y=126pt (top ~118pt for 11pt Times) */
+/* Content area */
 .page11-content {
   position: absolute;
-  top: 118pt; /* Adjusted so first text baseline lands at ~126pt */
-  left: 36pt;
-  right: 36pt;
-  bottom: 100pt; /* Leave space for footer */
+  top: 1.5in;
+  left: 0.5in;
+  right: 0.5in;
+  bottom: 1.4in;
   font-family: 'Times New Roman', Times, serif;
-  font-size: 11pt;
-  line-height: 14pt;
+  font-size: 10pt;
+  line-height: 1.3;
   overflow: hidden;
 }
 
@@ -1201,93 +1198,96 @@ body.preview-active .footer {
   word-wrap: break-word;
 }
 
-/* Footer container - starts at y=697pt */
+/* Footer container */
 .page11-footer {
   position: absolute;
-  top: 697pt;
-  left: 36pt;
-  right: 36pt;
-  bottom: 0;
+  left: 0.5in;
+  right: 0.5in;
+  bottom: 0.35in;
+  height: 1in;
 }
 
-/* Line above footer boxes - at y=697pt */
+/* Line above footer boxes */
 .page11-footer::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  border-top: 0.5pt solid #000;
+  border-top: 0.75pt solid #000;
 }
 
-/* NAME and EDIPI boxes container - starts 5pt below line (y=702pt) */
+/* NAME and EDIPI boxes container */
 .footer-boxes {
   position: absolute;
-  top: 5pt;
+  top: 0;
   left: 0;
   right: 0;
   display: flex;
-  height: 35pt;
+  height: 0.4in;
+  border-bottom: 0.75pt solid #000;
 }
 
-/* Box styling - exact heights and borders */
+/* Box styling */
 .name-box,
 .edipi-box {
-  border: 0.75pt solid #000;
-  height: 35pt;
+  height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   box-sizing: border-box;
+  border-right: 0.75pt solid #000;
 }
 
-/* NAME box: 75% of 540pt = 405pt */
-.name-box {
-  width: 405pt;
-  flex-shrink: 0;
-}
-
-/* EDIPI box: 25% of 540pt = 135pt */
 .edipi-box {
-  width: 135pt;
+  border-right: none;
+}
+
+/* NAME box: ~78% width */
+.name-box {
+  width: 78%;
   flex-shrink: 0;
 }
 
-/* Value text inside boxes - Times 11pt */
+/* EDIPI box: ~22% width */
+.edipi-box {
+  width: 22%;
+  flex-shrink: 0;
+}
+
+/* Value text inside boxes */
 .box-value {
+  position: absolute;
+  top: 2pt;
+  left: 4pt;
   font-family: 'Times New Roman', Times, serif;
-  font-size: 11pt;
-  padding: 2pt 5pt;
-  flex: 1;
+  font-size: 10pt;
   text-transform: uppercase;
 }
 
-/* Labels at bottom of boxes - Helvetica 8pt */
+/* Labels at bottom center of boxes */
 .box-label {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
-  padding-bottom: 3pt;
+  padding-bottom: 2pt;
   color: #000;
-  line-height: 1;
 }
 
-/* Bottom row - at y=752pt (55pt from footer top) */
+/* Bottom row with form info */
 .footer-bottom {
   position: absolute;
-  top: 55pt; /* 5pt + 35pt boxes + 15pt gap */
+  top: 0.45in;
   left: 0;
   right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
 }
 
 /* Form info - left side */
 .form-info {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .form-info strong {
@@ -1298,35 +1298,34 @@ body.preview-active .footer {
 .form-info span {
   font-size: 7pt;
   display: block;
-  margin-top: 2pt;
 }
 
 /* Page number - center */
 .page-number {
   position: absolute;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
-  display: flex;
-  align-items: baseline;
 }
 
 .page-line {
   display: inline-block;
-  width: 35pt;
-  border-bottom: 0.5pt solid #000;
-  margin-left: 5pt;
+  width: 0.5in;
+  border-bottom: 0.75pt solid #000;
+  margin-left: 4pt;
+  vertical-align: middle;
 }
 
-/* FOUO notice - at y=772pt (75pt from footer top = 792-20) */
+/* FOUO notice - centered at bottom */
 .fouo-notice {
   position: absolute;
-  top: 75pt; /* 697 + 75 = 772pt from page top */
+  bottom: 0;
   left: 0;
   right: 0;
   text-align: center;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   font-weight: bold;
 }

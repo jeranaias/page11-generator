@@ -5,25 +5,23 @@
  */
 
 const PDFGenerator = {
-  // Page dimensions (Letter size in points: 612 x 792)
+  // Page dimensions (Letter size: 8.5" x 11" = 612pt x 792pt)
+  // Matches actual NAVMC 118(11) (REV. 05-2014) layout
   PAGE: {
-    WIDTH: 612,
-    HEIGHT: 792,
-    MARGIN_LEFT: 36,      // 0.5"
-    MARGIN_RIGHT: 36,     // 0.5"
-    MARGIN_TOP: 36,       // 0.5"
-    MARGIN_BOTTOM: 100    // Space for footer with NAME/EDIPI
+    WIDTH: 612,           // 8.5"
+    HEIGHT: 792,          // 11"
+    MARGIN: 36            // 0.5" margins
   },
 
-  // Typography
+  // Typography - matches official form
   FONTS: {
     BODY: 'times',
-    HEADER: 'helvetica',
-    MONO: 'courier'
+    HEADER: 'helvetica'
   },
 
   /**
    * Generate PDF with the Page 11 entry
+   * Layout matches actual NAVMC 118(11) exactly
    */
   generate(options, returnBlob = false) {
     if (!window.jspdf) {
@@ -33,7 +31,7 @@ const PDFGenerator = {
 
     const { jsPDF } = window.jspdf;
     const P = this.PAGE;
-    const contentWidth = P.WIDTH - P.MARGIN_LEFT - P.MARGIN_RIGHT;
+    const contentWidth = P.WIDTH - (P.MARGIN * 2); // 540pt = 7.5"
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -41,28 +39,28 @@ const PDFGenerator = {
       format: 'letter'
     });
 
-    let y = P.MARGIN_TOP;
+    let y = P.MARGIN;
     let pageNum = 1;
 
     // ========================================
     // DRAW PAGE HEADER
     // ========================================
     const drawHeader = () => {
-      // "G" code box - top right corner
-      const gBoxSize = 45;
-      const gBoxX = P.WIDTH - P.MARGIN_RIGHT - gBoxSize;
-      const gBoxY = P.MARGIN_TOP;
+      // "G" code box - top right corner (0.65" x 0.65", 2pt border)
+      const gBoxSize = 47; // ~0.65"
+      const gBoxX = P.WIDTH - P.MARGIN - gBoxSize;
+      const gBoxY = 29; // 0.4" from top
 
       pdf.setDrawColor(0);
-      pdf.setLineWidth(1.5);
+      pdf.setLineWidth(2);
       pdf.rect(gBoxX, gBoxY, gBoxSize, gBoxSize);
 
       pdf.setFont(this.FONTS.HEADER, 'bold');
-      pdf.setFontSize(32);
-      pdf.text('G', gBoxX + gBoxSize / 2, gBoxY + 33, { align: 'center' });
+      pdf.setFontSize(36);
+      pdf.text('G', gBoxX + gBoxSize / 2, gBoxY + 35, { align: 'center' });
 
-      // Title: "ADMINISTRATIVE REMARKS (1070)"
-      const titleY = P.MARGIN_TOP + 60;
+      // Title: "ADMINISTRATIVE REMARKS (1070)" at ~1.1" from top
+      const titleY = 79; // ~1.1"
       pdf.setFont(this.FONTS.HEADER, 'bold');
       pdf.setFontSize(12);
       const titleText = 'ADMINISTRATIVE REMARKS (1070)';
@@ -71,98 +69,96 @@ const PDFGenerator = {
 
       pdf.text(titleText, titleX, titleY, { align: 'center' });
 
-      // Underline the title
+      // Underline below title (extends slightly beyond text)
+      pdf.setLineWidth(1);
+      pdf.line(titleX - titleWidth / 2 - 8, titleY + 4, titleX + titleWidth / 2 + 8, titleY + 4);
+
+      // Horizontal line below header at ~1.4" from top
+      const lineY = 101; // ~1.4"
       pdf.setLineWidth(0.75);
-      pdf.line(titleX - titleWidth / 2 - 5, titleY + 3, titleX + titleWidth / 2 + 5, titleY + 3);
+      pdf.line(P.MARGIN, lineY, P.WIDTH - P.MARGIN, lineY);
 
-      // Horizontal line below header
-      const lineY = titleY + 15;
-      pdf.setLineWidth(0.5);
-      pdf.line(P.MARGIN_LEFT, lineY, P.WIDTH - P.MARGIN_RIGHT, lineY);
-
-      return lineY + 15; // Return Y position after header
+      return 108; // Content starts at ~1.5" from top
     };
 
     // ========================================
     // DRAW PAGE FOOTER
     // ========================================
     const drawFooter = (pageNumber) => {
-      const footerTopY = P.HEIGHT - 95;
+      // Footer area starts at ~9.6" from top (bottom - 1.4")
+      const footerTop = P.HEIGHT - 101; // 691pt
 
       // Horizontal line above footer
-      pdf.setLineWidth(0.5);
-      pdf.setDrawColor(0);
-      pdf.line(P.MARGIN_LEFT, footerTopY, P.WIDTH - P.MARGIN_RIGHT, footerTopY);
-
-      // NAME and EDIPI boxes
-      const boxY = footerTopY + 5;
-      const boxHeight = 35;
-      const nameBoxWidth = contentWidth * 0.75;
-      const edipiBoxWidth = contentWidth * 0.25;
-
-      // NAME box
       pdf.setLineWidth(0.75);
-      pdf.rect(P.MARGIN_LEFT, boxY, nameBoxWidth, boxHeight);
+      pdf.setDrawColor(0);
+      pdf.line(P.MARGIN, footerTop, P.WIDTH - P.MARGIN, footerTop);
+
+      // NAME and EDIPI boxes (0.4" tall = ~29pt)
+      const boxHeight = 29;
+      const nameBoxWidth = contentWidth * 0.78;
+      const edipiBoxWidth = contentWidth * 0.22;
+
+      // Draw box borders
+      pdf.setLineWidth(0.75);
+      // NAME box - left, bottom, right sides (top is the footer line)
+      pdf.line(P.MARGIN, footerTop, P.MARGIN, footerTop + boxHeight); // left
+      pdf.line(P.MARGIN, footerTop + boxHeight, P.MARGIN + nameBoxWidth, footerTop + boxHeight); // bottom
+      pdf.line(P.MARGIN + nameBoxWidth, footerTop, P.MARGIN + nameBoxWidth, footerTop + boxHeight); // right
 
       // EDIPI box
-      pdf.rect(P.MARGIN_LEFT + nameBoxWidth, boxY, edipiBoxWidth, boxHeight);
+      pdf.line(P.MARGIN + nameBoxWidth, footerTop + boxHeight, P.WIDTH - P.MARGIN, footerTop + boxHeight); // bottom
+      pdf.line(P.WIDTH - P.MARGIN, footerTop, P.WIDTH - P.MARGIN, footerTop + boxHeight); // right
 
-      // Box labels (centered at bottom of boxes)
+      // Box labels (centered at bottom)
       pdf.setFont(this.FONTS.HEADER, 'normal');
       pdf.setFontSize(8);
-      pdf.text('NAME (last, first, middle)', P.MARGIN_LEFT + nameBoxWidth / 2, boxY + boxHeight - 5, { align: 'center' });
-      pdf.text('EDIPI', P.MARGIN_LEFT + nameBoxWidth + edipiBoxWidth / 2, boxY + boxHeight - 5, { align: 'center' });
+      pdf.text('NAME (last, first, middle)', P.MARGIN + nameBoxWidth / 2, footerTop + boxHeight - 3, { align: 'center' });
+      pdf.text('EDIPI', P.MARGIN + nameBoxWidth + edipiBoxWidth / 2, footerTop + boxHeight - 3, { align: 'center' });
 
-      // Fill in NAME and EDIPI values if provided
+      // Fill in NAME and EDIPI values
       if (options.marineName) {
         pdf.setFont(this.FONTS.BODY, 'normal');
-        pdf.setFontSize(11);
-        pdf.text(options.marineName.toUpperCase(), P.MARGIN_LEFT + 5, boxY + 15);
+        pdf.setFontSize(10);
+        pdf.text(options.marineName.toUpperCase(), P.MARGIN + 4, footerTop + 12);
       }
       if (options.marineEDIPI) {
         pdf.setFont(this.FONTS.BODY, 'normal');
-        pdf.setFontSize(11);
-        pdf.text(options.marineEDIPI, P.MARGIN_LEFT + nameBoxWidth + 5, boxY + 15);
+        pdf.setFontSize(10);
+        pdf.text(options.marineEDIPI, P.MARGIN + nameBoxWidth + 4, footerTop + 12);
       }
 
-      // Bottom row
-      const bottomRowY = boxY + boxHeight + 15;
+      // Bottom row (below boxes)
+      const bottomRowY = footerTop + boxHeight + 12;
 
       // Form number - bottom left
       pdf.setFont(this.FONTS.HEADER, 'bold');
       pdf.setFontSize(8);
-      pdf.text('NAVMC 118(11) (REV. 05-2014) (EF)', P.MARGIN_LEFT, bottomRowY);
+      pdf.text('NAVMC 118(11) (REV. 05-2014) (EF)', P.MARGIN, bottomRowY);
 
       // "PREVIOUS EDITIONS ARE OBSOLETE" below form number
       pdf.setFont(this.FONTS.HEADER, 'normal');
       pdf.setFontSize(7);
-      pdf.text('PREVIOUS EDITIONS ARE OBSOLETE', P.MARGIN_LEFT, bottomRowY + 10);
+      pdf.text('PREVIOUS EDITIONS ARE OBSOLETE', P.MARGIN, bottomRowY + 9);
 
       // Page number - center "11. ___"
       pdf.setFont(this.FONTS.HEADER, 'normal');
       pdf.setFontSize(10);
-      const pageNumText = `11.`;
-      pdf.text(pageNumText, P.WIDTH / 2 - 10, bottomRowY + 5);
+      pdf.text('11.', P.WIDTH / 2 - 12, bottomRowY);
       // Page number line
-      pdf.setLineWidth(0.5);
-      pdf.line(P.WIDTH / 2 + 5, bottomRowY + 5, P.WIDTH / 2 + 40, bottomRowY + 5);
-      // Actual page number above line if multi-page
-      if (pageNumber > 0) {
-        pdf.setFontSize(9);
-        pdf.text(String(pageNumber), P.WIDTH / 2 + 20, bottomRowY + 3);
-      }
+      pdf.setLineWidth(0.75);
+      pdf.line(P.WIDTH / 2 + 2, bottomRowY, P.WIDTH / 2 + 38, bottomRowY);
 
-      // FOUO notice - bottom center
+      // FOUO notice - centered at very bottom
       pdf.setFont(this.FONTS.HEADER, 'bold');
       pdf.setFontSize(8);
-      pdf.text('FOUO - Privacy sensitive when filled in', P.WIDTH / 2, P.HEIGHT - 20, { align: 'center' });
+      pdf.text('FOUO - Privacy sensitive when filled in', P.WIDTH / 2, P.HEIGHT - 25, { align: 'center' });
     };
 
     // ========================================
     // PAGE BREAK HANDLER
     // ========================================
     const checkPageBreak = (needed) => {
-      const maxY = P.HEIGHT - P.MARGIN_BOTTOM - 10;
+      const maxY = P.HEIGHT - 110; // Stop before footer area
       if (y + needed > maxY) {
         // Draw footer on current page
         drawFooter(pageNum);
@@ -183,15 +179,15 @@ const PDFGenerator = {
     // DRAW ENTRY CONTENT
     // ========================================
     const drawEntry = () => {
-      const lineHeight = 14;
-      const entryX = P.MARGIN_LEFT;
-      const maxWidth = contentWidth - 10;
+      const lineHeight = 13; // ~10pt font with spacing
+      const entryX = P.MARGIN;
+      const maxWidth = contentWidth - 5;
 
       // Split entry text into lines
       const entryLines = options.entryText.split('\n');
 
       pdf.setFont(this.FONTS.BODY, 'normal');
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
 
       for (let i = 0; i < entryLines.length; i++) {
         const line = entryLines[i];
@@ -213,12 +209,6 @@ const PDFGenerator = {
                              !line.includes('_') &&
                              line.trim().length > 0;
 
-        // Check if this is a DATE line
-        const isDateLine = line.trim().toUpperCase().startsWith('DATE') ||
-                           /^\d{1,2}\s+(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)/i.test(line.trim()) ||
-                           /^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(line.trim()) ||
-                           /^[A-Z]{3,9}\s+\d{1,2},?\s+\d{4}/i.test(line.trim());
-
         // Set font based on line type
         if (isHeaderLine && i < 5) {
           pdf.setFont(this.FONTS.BODY, 'bold');
@@ -234,7 +224,7 @@ const PDFGenerator = {
 
           if (isSignatureLine) {
             // Right-align signature lines
-            pdf.text(wrapLine, P.WIDTH - P.MARGIN_RIGHT - 10, y, { align: 'right' });
+            pdf.text(wrapLine, P.WIDTH - P.MARGIN - 10, y, { align: 'right' });
           } else {
             pdf.text(wrapLine, entryX, y);
           }
