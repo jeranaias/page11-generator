@@ -43,7 +43,7 @@ const PDFGenerator = {
     let pageNum = 1;
 
     // ========================================
-    // DRAW PAGE HEADER
+    // DRAW PAGE HEADER (G-box and title)
     // ========================================
     const drawHeader = () => {
       // "G" code box - top right corner (0.65" x 0.65", 2pt border)
@@ -78,7 +78,73 @@ const PDFGenerator = {
       pdf.setLineWidth(0.75);
       pdf.line(P.MARGIN, lineY, P.WIDTH - P.MARGIN, lineY);
 
-      return 108; // Content starts at ~1.5" from top
+      return lineY; // Return the header line Y position
+    };
+
+    // ========================================
+    // DRAW 3-COLUMN DATE SECTION
+    // ========================================
+    const drawDateSection = (headerLineY) => {
+      const dateSectionTop = headerLineY;
+      const dateSectionHeight = 72; // ~1 inch for the date section
+      const dateSectionBottom = dateSectionTop + dateSectionHeight;
+      const colWidth = contentWidth / 3;
+
+      // Draw vertical lines dividing the 3 columns
+      pdf.setLineWidth(0.75);
+      pdf.setDrawColor(0);
+
+      // First divider (after column 1)
+      pdf.line(P.MARGIN + colWidth, dateSectionTop, P.MARGIN + colWidth, dateSectionBottom);
+      // Second divider (after column 2)
+      pdf.line(P.MARGIN + colWidth * 2, dateSectionTop, P.MARGIN + colWidth * 2, dateSectionBottom);
+
+      // Outer frame sides for date section
+      pdf.line(P.MARGIN, dateSectionTop, P.MARGIN, dateSectionBottom); // left side
+      pdf.line(P.WIDTH - P.MARGIN, dateSectionTop, P.WIDTH - P.MARGIN, dateSectionBottom); // right side
+
+      // Bottom line of date section
+      pdf.line(P.MARGIN, dateSectionBottom, P.WIDTH - P.MARGIN, dateSectionBottom);
+
+      // Draw "DATE" headers and signature lines in each column
+      for (let i = 0; i < 3; i++) {
+        const colX = P.MARGIN + (colWidth * i);
+        const colCenterX = colX + colWidth / 2;
+
+        // "DATE" header at top of each column
+        pdf.setFont(this.FONTS.HEADER, 'bold');
+        pdf.setFontSize(8);
+        pdf.text('DATE', colCenterX, dateSectionTop + 12, { align: 'center' });
+
+        // Signature line near bottom of each column
+        const sigLineY = dateSectionBottom - 18;
+        const sigLineWidth = colWidth * 0.7;
+        pdf.setLineWidth(0.5);
+        pdf.line(colCenterX - sigLineWidth / 2, sigLineY, colCenterX + sigLineWidth / 2, sigLineY);
+
+        // "(Signature)" label below the line
+        pdf.setFont(this.FONTS.HEADER, 'normal');
+        pdf.setFontSize(7);
+        pdf.text('(Signature)', colCenterX, sigLineY + 10, { align: 'center' });
+      }
+
+      return dateSectionBottom; // Return where the main body starts
+    };
+
+    // ========================================
+    // DRAW MAIN BODY AREA WITH CENTER LINE
+    // ========================================
+    const drawBodyFrame = (bodyTop, footerTop) => {
+      pdf.setLineWidth(0.75);
+      pdf.setDrawColor(0);
+
+      // Left and right borders of the body area
+      pdf.line(P.MARGIN, bodyTop, P.MARGIN, footerTop); // left
+      pdf.line(P.WIDTH - P.MARGIN, bodyTop, P.WIDTH - P.MARGIN, footerTop); // right
+
+      // CENTER VERTICAL LINE - the key feature!
+      const centerX = P.WIDTH / 2;
+      pdf.line(centerX, bodyTop, centerX, footerTop);
     };
 
     // ========================================
@@ -152,13 +218,16 @@ const PDFGenerator = {
       pdf.setFont(this.FONTS.HEADER, 'bold');
       pdf.setFontSize(8);
       pdf.text('FOUO - Privacy sensitive when filled in', P.WIDTH / 2, P.HEIGHT - 25, { align: 'center' });
+
+      return footerTop;
     };
 
     // ========================================
     // PAGE BREAK HANDLER
     // ========================================
+    const footerTop = P.HEIGHT - 101;
     const checkPageBreak = (needed) => {
-      const maxY = P.HEIGHT - 110; // Stop before footer area
+      const maxY = footerTop - 10; // Stop before footer area
       if (y + needed > maxY) {
         // Draw footer on current page
         drawFooter(pageNum);
@@ -168,7 +237,10 @@ const PDFGenerator = {
         pageNum++;
 
         // Draw header on new page
-        y = drawHeader();
+        const headerLineY = drawHeader();
+        const bodyTop = drawDateSection(headerLineY);
+        drawBodyFrame(bodyTop, footerTop);
+        y = bodyTop + 15;
 
         return true;
       }
@@ -178,10 +250,12 @@ const PDFGenerator = {
     // ========================================
     // DRAW ENTRY CONTENT
     // ========================================
-    const drawEntry = () => {
+    const drawEntry = (bodyTop) => {
       const lineHeight = 13; // ~10pt font with spacing
-      const entryX = P.MARGIN;
-      const maxWidth = contentWidth - 5;
+      const entryX = P.MARGIN + 5;
+      const maxWidth = (contentWidth / 2) - 15; // Half width for left column
+
+      y = bodyTop + 15; // Start content after date section
 
       // Split entry text into lines
       const entryLines = options.entryText.split('\n');
@@ -216,15 +290,15 @@ const PDFGenerator = {
           pdf.setFont(this.FONTS.BODY, 'normal');
         }
 
-        // Wrap text
+        // Wrap text to fit in left column
         const wrappedLines = pdf.splitTextToSize(line, maxWidth);
 
         for (const wrapLine of wrappedLines) {
           checkPageBreak(lineHeight);
 
           if (isSignatureLine) {
-            // Right-align signature lines
-            pdf.text(wrapLine, P.WIDTH - P.MARGIN - 10, y, { align: 'right' });
+            // Right-align signature lines within left column
+            pdf.text(wrapLine, P.WIDTH / 2 - 10, y, { align: 'right' });
           } else {
             pdf.text(wrapLine, entryX, y);
           }
@@ -239,10 +313,16 @@ const PDFGenerator = {
     // ========================================
 
     // Draw first page header
-    y = drawHeader();
+    const headerLineY = drawHeader();
 
-    // Draw entry content
-    drawEntry();
+    // Draw 3-column DATE section
+    const bodyTop = drawDateSection(headerLineY);
+
+    // Draw body frame with center line
+    drawBodyFrame(bodyTop, footerTop);
+
+    // Draw entry content in left column
+    drawEntry(bodyTop);
 
     // Draw footer on last page
     drawFooter(pageNum);
@@ -303,16 +383,13 @@ const PDFGenerator = {
 
   /**
    * Generate preview HTML that matches PDF layout EXACTLY
-   * All elements absolutely positioned to match PDF coordinates:
-   * - Page: 612pt x 792pt
-   * - G-box: top-right at 36pt from edges, 45pt square
-   * - Title: y=96pt centered, underlined
-   * - Header line: y=111pt
-   * - Content: starts y=126pt
-   * - Footer line: y=697pt
-   * - NAME/EDIPI boxes: y=702pt, 35pt tall
-   * - Bottom row: y=752pt
-   * - FOUO: y=772pt
+   * Layout matches actual NAVMC 118(11) (REV. 05-2014):
+   * - G-box: top-right corner
+   * - Title: "ADMINISTRATIVE REMARKS (1070)" centered, underlined
+   * - Header line: horizontal divider
+   * - 3-column DATE section: with DATE headers and signature lines
+   * - Main body: TWO COLUMNS divided by CENTER VERTICAL LINE
+   * - Footer: NAME/EDIPI boxes, form info, page number, FOUO notice
    */
   generatePreviewHTML(options) {
     const escapedName = this.escapeHtml(options.marineName || '').toUpperCase();
@@ -330,9 +407,35 @@ const PDFGenerator = {
         <!-- Header line -->
         <div class="page11-header-line"></div>
 
-        <!-- Entry content -->
-        <div class="page11-content">
-          <div class="entry-text">${escapedEntry}</div>
+        <!-- 3-column DATE section -->
+        <div class="page11-date-section">
+          <div class="date-column">
+            <div class="date-header">DATE</div>
+            <div class="date-content"></div>
+            <div class="date-signature-line"></div>
+            <div class="date-signature-label">(Signature)</div>
+          </div>
+          <div class="date-column">
+            <div class="date-header">DATE</div>
+            <div class="date-content"></div>
+            <div class="date-signature-line"></div>
+            <div class="date-signature-label">(Signature)</div>
+          </div>
+          <div class="date-column">
+            <div class="date-header">DATE</div>
+            <div class="date-content"></div>
+            <div class="date-signature-line"></div>
+            <div class="date-signature-label">(Signature)</div>
+          </div>
+        </div>
+
+        <!-- Main body with center vertical line -->
+        <div class="page11-body">
+          <div class="body-left-column">
+            <div class="entry-text">${escapedEntry}</div>
+          </div>
+          <div class="body-center-line"></div>
+          <div class="body-right-column"></div>
         </div>
 
         <!-- Footer -->

@@ -1180,7 +1180,108 @@ body.preview-active .footer {
   border-top: 0.75pt solid #000;
 }
 
-/* Content area */
+/* ==========================================================================
+   3-Column DATE Section - Below header line
+   ========================================================================== */
+.page11-date-section {
+  position: absolute;
+  top: 1.4in;
+  left: 0.5in;
+  right: 0.5in;
+  height: 1in;
+  display: flex;
+  border-left: 0.75pt solid #000;
+  border-right: 0.75pt solid #000;
+  border-bottom: 0.75pt solid #000;
+  box-sizing: border-box;
+}
+
+.date-column {
+  flex: 1;
+  position: relative;
+  border-right: 0.75pt solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6pt 8pt;
+  box-sizing: border-box;
+}
+
+.date-column:last-child {
+  border-right: none;
+}
+
+.date-header {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: auto;
+}
+
+.date-content {
+  flex: 1;
+  width: 100%;
+}
+
+.date-signature-line {
+  width: 70%;
+  border-bottom: 0.5pt solid #000;
+  margin-bottom: 2pt;
+}
+
+.date-signature-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7pt;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Main Body Area - Two columns with CENTER VERTICAL LINE
+   ========================================================================== */
+.page11-body {
+  position: absolute;
+  top: 2.4in;
+  left: 0.5in;
+  right: 0.5in;
+  bottom: 1.4in;
+  display: flex;
+  border-left: 0.75pt solid #000;
+  border-right: 0.75pt solid #000;
+  box-sizing: border-box;
+}
+
+.body-left-column {
+  flex: 1;
+  padding: 8pt;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 10pt;
+  line-height: 1.3;
+  overflow: hidden;
+}
+
+.body-left-column .entry-text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* THE CENTER VERTICAL LINE - Key feature of Page 11 */
+.body-center-line {
+  width: 0;
+  border-left: 0.75pt solid #000;
+  flex-shrink: 0;
+}
+
+.body-right-column {
+  flex: 1;
+  padding: 8pt;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 10pt;
+  line-height: 1.3;
+  overflow: hidden;
+}
+
+/* Legacy content area - keep for backwards compatibility */
 .page11-content {
   position: absolute;
   top: 1.5in;
@@ -1191,6 +1292,7 @@ body.preview-active .footer {
   font-size: 10pt;
   line-height: 1.3;
   overflow: hidden;
+  display: none; /* Hidden - using new body layout instead */
 }
 
 .page11-content .entry-text {
