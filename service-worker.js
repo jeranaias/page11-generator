@@ -3,19 +3,19 @@
  * Enables offline functionality
  */
 
-const CACHE_NAME = 'page11-generator-v14';
+const CACHE_NAME = 'page11-generator-v15';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/templates.js',
-  '/js/date-utils.js',
-  '/js/storage.js',
-  '/js/pdf-generator.js',
-  '/assets/icon-192.svg',
-  '/assets/icon-512.svg',
-  '/manifest.json'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/templates.js',
+  './js/date-utils.js',
+  './js/storage.js',
+  './js/pdf-generator.js',
+  './assets/icon-192.svg',
+  './assets/icon-512.svg',
+  './manifest.json'
 ];
 
 // Install event - cache resources
