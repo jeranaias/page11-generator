@@ -100,21 +100,21 @@
 
       <!-- Category Selection Cards -->
       <div class="category-cards" id="categoryCards">
-        <button type="button" class="category-card" data-category="training">
-          <span class="category-card__title">Training &amp; Quals</span>
-          <span class="category-card__desc">MOS, PME, weapons, schools</span>
+        <button type="button" class="category-card category-card--primary" data-category="6105">
+          <span class="category-card__title">6105 Counseling</span>
+          <span class="category-card__desc">UCMJ violations, adverse counseling</span>
+        </button>
+        <button type="button" class="category-card" data-category="adverse">
+          <span class="category-card__title">Adverse Action</span>
+          <span class="category-card__desc">NJP, page 11 warning, etc.</span>
         </button>
         <button type="button" class="category-card" data-category="counseling">
           <span class="category-card__title">Counseling</span>
           <span class="category-card__desc">Performance, initial, transfer</span>
         </button>
-        <button type="button" class="category-card" data-category="6105">
-          <span class="category-card__title">6105 Counseling</span>
-          <span class="category-card__desc">Documented adverse counseling</span>
-        </button>
-        <button type="button" class="category-card" data-category="adverse">
-          <span class="category-card__title">Adverse Action</span>
-          <span class="category-card__desc">NJP, page 11 warning, etc.</span>
+        <button type="button" class="category-card" data-category="training">
+          <span class="category-card__title">Training &amp; Quals</span>
+          <span class="category-card__desc">MOS, PME, weapons, schools</span>
         </button>
         <button type="button" class="category-card" data-category="admin">
           <span class="category-card__title">Admin Entries</span>
@@ -170,8 +170,9 @@
         <p class="marine-info-label">Marine Information (for PDF form header)</p>
         <div class="marine-info-grid marine-info-grid--two">
           <div class="form-group">
-            <label class="label" for="marineName">NAME (last, first, middle)</label>
-            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN ADAM" autocomplete="off">
+            <label class="label" for="marineName">NAME (last, first, middle initial)</label>
+            <input type="text" class="input" id="marineName" placeholder="DOE, JOHN A" autocomplete="off">
+            <p class="help-text">Format: LASTNAME, FIRSTNAME MI (e.g., SMITH, JOHN A)</p>
           </div>
           <div class="form-group">
             <label class="label" for="marineEDIPI">EDIPI</label>

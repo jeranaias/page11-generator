@@ -461,6 +461,16 @@ details[open] > summary.section-title::after {
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* Primary category card - highlighted for common use */
+.category-card--primary {
+  border-color: var(--accent-red);
+  background: rgba(196, 30, 58, 0.1);
+}
+
+.category-card--primary:hover {
+  background: rgba(196, 30, 58, 0.2);
+}
+
 /* Responsive: 4 columns on desktop, 3 on tablet, 2 on mobile */
 @media (min-width: 768px) {
   .category-cards {

@@ -19,21 +19,21 @@ const UCMJ_ARTICLES = [
 ];
 
 const CATEGORIES = {
-  training: {
-    name: "Training & Qualifications",
-    templates: ["rifle_qual", "pistol_qual", "pft", "cft", "pme", "formal_school"]
-  },
-  counseling: {
-    name: "Counselings (Non-Adverse)",
-    templates: ["initial_counseling", "mid_marking", "career_counseling"]
+  "6105": {
+    name: "6105 Counseling",
+    templates: ["6105_counseling", "6105_ucmj"]
   },
   adverse: {
     name: "Adverse Counselings",
     templates: ["performance_deficiency", "conduct_deficiency"]
   },
-  "6105": {
-    name: "6105 Counseling",
-    templates: ["6105_counseling"]
+  counseling: {
+    name: "Counselings (Non-Adverse)",
+    templates: ["initial_counseling", "mid_marking", "career_counseling"]
+  },
+  training: {
+    name: "Training & Qualifications",
+    templates: ["rifle_qual", "pistol_qual", "pft", "cft", "pme", "formal_school"]
   },
   admin: {
     name: "Administrative Entries",
@@ -330,7 +330,7 @@ I acknowledge receipt of this counseling and understand its contents.
   // ============================================
   "6105_counseling": {
     id: "6105_counseling",
-    name: "6105 Counseling",
+    name: "6105 Counseling (General)",
     category: "6105",
     fields: [
       { id: "reason", label: "Reason (for subject line)", type: "text", required: true, placeholder: "e.g., UNAUTHORIZED ABSENCE" },
@@ -341,40 +341,77 @@ I acknowledge receipt of this counseling and understand its contents.
       { id: "ucmj_article", label: "UCMJ Article", type: "ucmj_select", required: false, conditional: { field: "violation_type", value: "UCMJ Article" } },
       { id: "policy_reference", label: "Policy/Regulation Reference", type: "text", required: false, placeholder: "e.g., MCO 1020.34H", conditional: { field: "violation_type", value: "Policy/Regulation Violation" } },
       { id: "conduct_or_performance", label: "Type", type: "select", required: true, options: ["conduct", "performance"] },
-      { id: "corrective_action", label: "Specific Corrective Action Required", type: "textarea", required: true },
-      { id: "rebuttal_days", label: "Days to Submit Rebuttal", type: "number", required: true, value: 30 }
+      { id: "corrective_action", label: "Recommendations for Corrective Action", type: "textarea", required: true }
     ],
-    template: `[DATE]
+    template: `6105 COUNSELING - [reason]
 
-6105 COUNSELING - [reason]
+Counseled this date concerning the following deficiency:
 
-Counseled this date concerning [deficiency].
+[deficiency]
 
 On [incident_dates], you [incident_description].
 
 This [conduct_or_performance] is in violation of [violation_reference] and falls below the standards required of a Marine.
 
-You are advised that:
-1. This counseling constitutes a permanent entry in your Official Military Personnel File (OMPF).
-2. This documentation may be used as a basis for administrative separation.
-3. Repetition of this or similar [conduct_or_performance] will result in further adverse action.
-
-Specific corrective action required:
+Recommendations for corrective action:
 [corrective_action]
 
-You have the right to submit a written rebuttal statement within [rebuttal_days] days of this counseling. Any rebuttal will be attached to this entry.
+Failure to take corrective action may result in adverse administrative action including but not limited to: adverse fitness report/proficiency marks, non-recommendation for promotion, non-judicial punishment, and/or processing for administrative separation.
 
-I acknowledge receipt of this counseling and understand its contents.
+Failure to complete the terms of your enlistment contract may result in characterization of service as other than honorable.
 
-                                    _______________________
-                                    [Marine's Signature/Date]
-                                    (Signature does not indicate agreement)
+You have the right to submit a written rebuttal statement within 5 working days of this counseling. Any rebuttal will be attached to this entry.
 
-                                    _______________________
-                                    [Commanding Officer Signature/Date]
+I acknowledge receipt of this counseling. My signature does not indicate agreement with the contents.
 
-                                    _______________________
-                                    [Witness Signature/Date]`
+
+_______________________                    _________
+[snm_signature]                            Date
+
+
+_______________________                    _________
+Commanding Officer                         Date`
+  },
+
+  "6105_ucmj": {
+    id: "6105_ucmj",
+    name: "6105 Counseling (UCMJ Article)",
+    category: "6105",
+    fields: [
+      { id: "ucmj_article", label: "UCMJ Article", type: "ucmj_select", required: true },
+      { id: "incident_dates", label: "Date(s) of Incident", type: "text", required: true },
+      { id: "incident_description", label: "Detailed Description of Incident", type: "textarea", required: true, placeholder: "failed to report for duty at the appointed time (don't start with 'you')" },
+      { id: "conduct_or_performance", label: "Type", type: "select", required: true, options: ["conduct", "performance"] },
+      { id: "corrective_action", label: "Recommendations for Corrective Action", type: "textarea", required: true }
+    ],
+    template: `6105 COUNSELING - VIOLATION OF UCMJ ARTICLE [ucmj_article]
+
+Counseled this date concerning the following deficiency:
+
+Violation of Article [ucmj_article], Uniform Code of Military Justice.
+
+On [incident_dates], you [incident_description].
+
+This [conduct_or_performance] is in violation of Article [ucmj_article], UCMJ, and falls below the standards required of a Marine.
+
+Recommendations for corrective action:
+[corrective_action]
+
+Failure to take corrective action may result in adverse administrative action including but not limited to: adverse fitness report/proficiency marks, non-recommendation for promotion, non-judicial punishment, and/or processing for administrative separation.
+
+Failure to complete the terms of your enlistment contract may result in characterization of service as other than honorable.
+
+You have the right to submit a written rebuttal statement within 5 working days of this counseling. Any rebuttal will be attached to this entry.
+
+I acknowledge receipt of this counseling. My signature does not indicate agreement with the contents.
+
+
+_______________________                    _________
+[snm_signature]                            Date
+
+
+_______________________                    _________
+Commanding Officer                         Date`
   },
 
   // ============================================

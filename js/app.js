@@ -102,9 +102,10 @@ function installPWA() {
 
   // Initialize
   function init() {
-    // Set today's date
-    elements.entryDate.value = DateUtils.getTodayInputFormat();
-    updateFormattedDate();
+    // Entry date should remain BLANK until CO signs
+    // Per feedback: date is filled when document is signed, not when created
+    elements.entryDate.value = '';
+    elements.formattedDate.textContent = 'Leave blank until signed by CO';
 
     // Initialize theme
     ThemeManager.init();
@@ -513,6 +514,26 @@ function installPWA() {
       output = output.replace('[violation_reference]', violationRef);
     }
 
+    // Handle SNM signature line format (J. A. LASTNAME)
+    if (output.includes('[snm_signature]')) {
+      const marineName = elements.marineName.value.trim();
+      let snmSigFormat = '(SNM Signature)';
+      if (marineName) {
+        // Parse "DOE, JOHN A" to "J. A. DOE"
+        const parts = marineName.split(',');
+        if (parts.length >= 2) {
+          const lastName = parts[0].trim();
+          const firstMiddle = parts[1].trim().split(/\s+/);
+          const firstInitial = firstMiddle[0] ? firstMiddle[0].charAt(0) + '.' : '';
+          const middleInitial = firstMiddle[1] ? ' ' + firstMiddle[1].charAt(0) + '.' : '';
+          snmSigFormat = `${firstInitial}${middleInitial} ${lastName}`;
+        } else {
+          snmSigFormat = marineName;
+        }
+      }
+      output = output.replace('[snm_signature]', snmSigFormat);
+    }
+
     // Handle custom entry signature lines
     if (currentTemplate.id === 'custom') {
       let sigLines = '';
@@ -614,6 +635,26 @@ function installPWA() {
         violationRef = currentValues.policy_reference || '';
       }
       output = output.replace('[violation_reference]', violationRef);
+    }
+
+    // Handle SNM signature line format (J. A. LASTNAME)
+    if (output.includes('[snm_signature]')) {
+      const marineName = elements.marineName.value.trim();
+      let snmSigFormat = '(SNM Signature)';
+      if (marineName) {
+        // Parse "DOE, JOHN A" to "J. A. DOE"
+        const parts = marineName.split(',');
+        if (parts.length >= 2) {
+          const lastName = parts[0].trim();
+          const firstMiddle = parts[1].trim().split(/\s+/);
+          const firstInitial = firstMiddle[0] ? firstMiddle[0].charAt(0) + '.' : '';
+          const middleInitial = firstMiddle[1] ? ' ' + firstMiddle[1].charAt(0) + '.' : '';
+          snmSigFormat = `${firstInitial}${middleInitial} ${lastName}`;
+        } else {
+          snmSigFormat = marineName;
+        }
+      }
+      output = output.replace('[snm_signature]', snmSigFormat);
     }
 
     // Handle custom entry signature lines
@@ -824,8 +865,8 @@ function installPWA() {
     elements.categorySelect.value = '';
     elements.templateSelect.innerHTML = '<option value="">Select entry type...</option>';
     elements.templateSelectGroup.style.display = 'none';
-    elements.entryDate.value = DateUtils.getTodayInputFormat();
-    updateFormattedDate();
+    elements.entryDate.value = '';
+    elements.formattedDate.textContent = 'Leave blank until signed by CO';
     elements.nextBtn.disabled = true;
     elements.templateFields.innerHTML = '';
 
